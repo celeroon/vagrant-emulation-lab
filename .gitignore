@@ -1,0 +1,63 @@
+# =============================================================================
+# VAGRANT LAB - GITIGNORE
+# =============================================================================
+
+# Vagrant
+.vagrant/
+*.qcow2
+
+# Test directories
+test/
+
+# =============================================================================
+# PYTHON
+# =============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+ansible/ansible-venv/
+
+# =============================================================================
+# ANSIBLE
+# =============================================================================
+
+# Ansible collections
+ansible/collections/
+
+# =============================================================================
+# VIRTUALIZATION & CONTAINERS
+# =============================================================================
+
+# Vagrant provider specific directories
+fortigate-vagrant-libvirt/
+cisco-catalyst-8kv-vagrant-libvirt/
+guacamole-docker-compose/
+
+# =============================================================================
+# SECURITY & CERTIFICATES
+# =============================================================================
+
+# Private keys and certificates
+*.pem
+
+# =============================================================================
+# ARCHIVES & INSTALLERS
+# =============================================================================
+
+# Archives
+*.zip
+!data.zip
+!TevoraAutomatedRTGui.zip
+
+# Windows installers
+*.msi
+*.exe

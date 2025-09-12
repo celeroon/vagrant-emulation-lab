@@ -1,0 +1,14 @@
+collections:
+  - name: community.libvirt
+  - name: ansible.windows
+  - name: chocolatey.chocolatey
+  - name: ansible.posix
+  - name: fortinet.fortios
+  - name: community.general
+  - name: cisco.ios
+  - name: nvidia.nvue
+  - name: vyos.vyos
+  - name: community.network
+  - name: openvswitch.openvswitch
+  - name: community.crypto
+  - name: community.docker

@@ -22,6 +22,7 @@ git clone https://github.com/celeroon/vagrant-libvirt-labs
 - [Setup iptables](#setup-iptables)
 - [Install Guacamole](#install-guacamole)
 - [Disable offload](#disable-offload)
+- [Build Windows 11/2025 box](#build-windows-112025-box)
 
 ## Install RDP with Xrdp
 
@@ -719,4 +720,35 @@ Enable and start the service
 sudo systemctl daemon-reexec
 sudo systemctl enable disable-offload.service
 sudo systemctl start disable-offload.service
+```
+
+## Build Windows 11/2025 box
+
+In this lab you can use Windows 10 Vagrant boxes from Vagrant cloud, but if you want Windows 11 or Windows Server 2025 you need to build them.
+
+Clone project
+
+```bash
+git clone https://github.com/rgl/windows-vagrant.git
+cd windows-vagrant
+```
+
+Setup drivers
+
+```bash
+make drivers
+```
+
+> [!IMPORTANT]  
+> You can add more CPU (cpus/cores), RAM (memory), and increase the SSH timeout in the *.pkr.hcl files.
+> Box building can take up to a few hours!
+
+Build Windows 11 Vagrant (libvirt) box
+```bash
+make build-windows-11-24h2-libvirt
+```
+
+Build Windows Server 2025 Vagrant (libvirt) box
+```bash
+make build-windows-2025-libvirt
 ```

@@ -6,10 +6,22 @@ Make sure the virtualization is enabled
 grep -E '^flags.*(vmx|svm)' /proc/cpuinfo
 ```
 
-Install git, clone project and enter to the project:
+Install git
 
 ```bash
-git clone https://github.com/celeroon/vagrant-libvirt-labs
+sudo apt update && sudo apt install git -y
+```
+
+Clone project
+
+```bash
+git clone https://github.com/celeroon/vagrant-libvirt-labs $HOME/vagrant-libvirt-labs
+```
+
+Go to the project directory (this will be the main working directory for this project):
+
+```bash
+cd $HOME/vagrant-libvirt-labs
 ```
 
 - [Install RDP with Xrdp](#install-rdp-with-xrdp)
@@ -29,12 +41,6 @@ git clone https://github.com/celeroon/vagrant-libvirt-labs
 Main resource: [Guide to Set Up Remote Desktop (RDP) with Xrdp on Debian 12](https://www.howtoforge.com/guide-to-set-up-remote-desktop-with-xrdp-on-debian-12/)
 
 ### Installing Desktop Environment
-
-Refresh Debian repository:
-
-```bash
-sudo apt update
-```
 
 Install tasksel
 
@@ -69,13 +75,12 @@ Create new directory for TLS certificates
 
 ```bash
 sudo mkdir -p /etc/xrdp/certs
-cd /etc/xrdp/certs
 ```
 
 Generate Self-Signed certificates
 
 ```bash
-sudo openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 3650
+sudo openssl req -x509 -newkey rsa:2048 -nodes -keyout /etc/xrdp/certs/key.pem -out /etc/xrdp/certs/cert.pem -days 3650
 ```
 
 Change the ownership of the directory
@@ -638,7 +643,7 @@ First [install docker compose](/resources/docs/install-docker-compose.md)
 Clone the project
 
 ```
-git clone https://github.com/boschkundendienst/guacamole-docker-compose.git
+git clone https://github.com/celeroon/guacamole-docker-compose
 ```
 
 Move into thje project directory
@@ -674,7 +679,7 @@ sudo ethtool -K <main_interface> lro off
 
 To automate offloading disabling by script - create it and enable service:
 
-Define main interface name veriable
+Define the main interface name variable (change `eno1` to match your network interface)
 
 ```
 IFACE="eno1"
@@ -725,36 +730,3 @@ sudo systemctl daemon-reexec
 sudo systemctl enable disable-offload.service
 sudo systemctl start disable-offload.service
 ```
-
-## Build Windows 11/2025 box
-
-In this lab you can use Windows 10 Vagrant boxes from Vagrant cloud, but if you want Windows 11 or Windows Server 2025 you need to build them.
-
-Clone project
-
-```bash
-git clone https://github.com/rgl/windows-vagrant.git
-cd windows-vagrant
-```
-
-Setup drivers
-
-```bash
-make drivers
-```
-
-> [!IMPORTANT]  
-> You can add more CPU (cpus/cores), RAM (memory), and increase the SSH timeout in the *.pkr.hcl files.
-> Box building can take up to a few hours!
-
-Build Windows 11 Vagrant (libvirt) box
-```bash
-make build-windows-11-24h2-libvirt
-```
-
-Build Windows Server 2025 Vagrant (libvirt) box
-```bash
-make build-windows-2025-libvirt
-```
-
-When you run the build process, after the image is downloaded you will see QEMU start the VM. When the message appears that it is waiting for an SSH connection, you will also see a VNC port opened. You can use Remote Viewer to watch the Windows installation process by connecting to `vnc://localhost:59xx`. You may also allocate more resources to speed up the box building process.

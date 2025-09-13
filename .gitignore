@@ -46,6 +46,13 @@ esxi-vagrant-libvirt/
 guacamole-docker-compose/
 windows-vagrant/
 
+# Libvirt networks
+lab-internet.xml
+vagrant-mgmt.xml
+
+# Docker installations
+get-docker.sh
+
 # =============================================================================
 # SECURITY & CERTIFICATES
 # =============================================================================

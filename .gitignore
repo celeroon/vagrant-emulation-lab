@@ -40,7 +40,11 @@ ansible/collections/
 # Vagrant provider specific directories
 fortigate-vagrant-libvirt/
 cisco-catalyst-8kv-vagrant-libvirt/
+cisco-iosvl2-vagrant-libvirt/
+arubacx-vagrant-libvirt/
+esxi-vagrant-libvirt/
 guacamole-docker-compose/
+windows-vagrant/
 
 # =============================================================================
 # SECURITY & CERTIFICATES

@@ -288,6 +288,7 @@ vagrant box add --provider libvirt generic-x64/debian11
 vagrant box add --provider libvirt vyos/current
 vagrant box add --provider libvirt CumulusVXCommunity/cumulus-vx
 vagrant box add --provider libvirt joaobrlt/ubuntu-desktop-24.04
+vagrant box add --provider libvirt kalilinux/rolling
 ```
 
 For Windows I recommend boxes from [peru](https://portal.cloud.hashicorp.com/vagrant/discover/peru) but later I will show how to build Windows 11/2025 box:
@@ -374,6 +375,9 @@ cat > vagrant-mgmt.xml <<EOF
   <ip address='192.168.225.1' netmask='255.255.255.0'>
     <dhcp>
       <range start='192.168.225.230' end='192.168.225.250'/>
+      <host mac='52:54:02:54:00:02' ip='192.168.225.2'/>
+      <host mac='52:54:02:54:00:03' ip='192.168.225.3'/>
+      <host mac='52:54:02:54:00:04' ip='192.168.225.4'/>
       <host mac='52:54:02:54:00:05' ip='192.168.225.5'/>
       <host mac='52:54:02:54:00:06' ip='192.168.225.6'/>
       <host mac='52:54:02:54:00:07' ip='192.168.225.7'/>

@@ -29,4 +29,20 @@ Build Windows Server 2025 Vagrant (libvirt) box
 make build-windows-2025-libvirt
 ```
 
+Add the Windows 11 Vagrant box 
+
+```bash
+vagrant box add --name windows-11-24h2-amd64 \
+  --provider=libvirt \
+  windows-11-24h2-amd64-libvirt.box
+```
+
+Add the Windows 2025 Vagrant box 
+
+```bash
+vagrant box add --name windows-2025-amd64 \
+  --provider=libvirt \
+  windows-2025-amd64-libvirt.box
+```
+
 When you run the build process, after the image is downloaded you will see QEMU start the VM. When the message appears that it is waiting for an SSH connection, you will also see a VNC port opened. You can use Remote Viewer to watch the Windows installation process by connecting to `vnc://localhost:59xx`.

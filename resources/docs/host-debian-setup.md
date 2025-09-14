@@ -268,10 +268,10 @@ Install Vagrant plugins:
 vagrant plugin install vagrant-scp winrm winrm-elevated
 ```
 
-You can install latest `vagrant-libvirt` or install with 0.9.0 version - time tested (`vagrant plugin install vagrant-libvirt --plugin-version 0.9.0`):
+Install `vagrant-libvirt` plugin with 0.9.0 version (time tested)
 
 ```bash
-vagrant plugin install vagrant-libvirt
+vagrant plugin install vagrant-libvirt --plugin-version 0.9.0
 ```
 
 Make Vagrant's Ruby and gem the default:

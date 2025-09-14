@@ -81,8 +81,8 @@ set interfaces ethernet eth6 description '***To Kali***'
 Configure Branch-1 interface (eth7)
 
 ```bash
-set interfaces ethernet eth6 address 100.64.0.1/29
-set interfaces ethernet eth6 description '***To Branch-1***'
+set interfaces ethernet eth7 address 100.64.0.1/29
+set interfaces ethernet eth7 description '***To Branch-1***'
 ```
 
 Configure default route via upstream gateway (lab virbr10 interface)

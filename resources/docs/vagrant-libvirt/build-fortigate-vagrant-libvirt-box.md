@@ -35,13 +35,25 @@ sudo chmod u+x /var/lib/libvirt/images/fortios.qcow2
 Run the Packer build command. If you follow the project recommendations, you will have a DE installed on your Linux host. Running Packer with debug enabled may help you see errors during box creation
 
 ```bash
-PACKER_LOG=1 packer build -var "version=7.6.3" -var "image_name=fortios.qcow2" -var "gui_disabled=false" fortigate-ssl-vrf.pkr.hcl
+PACKER_LOG=1 packer build -var "version=7.6.3" -var "image_name=fortios.qcow2" -var "gui_disabled=false" fortigate-7.6.pkr.hcl
+```
+
+For FortiOS 7.2.0 and below
+
+```bash
+PACKER_LOG=1 packer build -var "version=7.2.0" -var "image_name=fortios.qcow2" -var "gui_disabled=false" fortigate-ssl-vrf.pkr.hcl
 ```
 
 Or you can run Packer without debug
 
 ```bash
-packer build -var "version=7.6.3" -var "image_name=fortios.qcow2" fortigate-ssl-vrf.pkr.hcl
+packer build -var "version=7.6.3" -var "image_name=fortios.qcow2" fortigate-7.6.pkr.hcl
+```
+
+For FortiOS 7.2.0 and below
+
+```bash
+packer build -var "version=7.2.0" -var "image_name=fortios.qcow2" fortigate-ssl-vrf.pkr.hcl
 ```
 
 Move the Vagrant box to the libvirt directory

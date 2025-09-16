@@ -1,6 +1,7 @@
 config.vm.define "branch-host-1" do |node|
   node.vm.guest = :debian
   node.vm.box = "generic-x64/debian11"
+  node.vm.hostname = "branch-host-1"
   node.vm.provider :libvirt do |domain|
     domain.management_network_mac = "52:54:02:54:00:29" # int Gi1   
     domain.cpus = 2

@@ -126,23 +126,97 @@ logging facility local7
 
 In this lab environment, I also want to configure Guestshell on the Cisco router to expose more applications that could be used in adversary emulation scenarios.
 
+Enable IOX (IOX eXtensions) for container support
+
+```bash
 iox
+```
+
+Create standard ACL for NAT translation
+
+```bash
 ip access-list standard IOX_NAT
 permit 192.168.100.0 0.0.0.255
 exit
+```
+
+Configure NAT overload on Gi2
+
+```bash
 ip nat inside source list IOX_NAT interface GigabitEthernet2 overload
+```
+
+Enter virtual port group interface
+
+```bash
 interface virtualportgroup 0
+```
+
+Set IP address for virtual interface
+
+```bash
 ip address 192.168.100.1 255.255.255.0
+```
+
+Configure as NAT inside interface
+
+```bash
 ip nat inside
+```
+
+Exit interface configuration
+
+```bash
 exit
+```
+
+Configure guestshell application hosting
+
+```bash
 app-hosting appid guestshell
-app-vnic gateway virtualportgroup 0 guest-interface 0
+```
+
+Set virtual NIC gateway
+
+```bash
+app-vnic gateway0 virtualportgroup 0 guest-interface 0
+```
+
+Set guest IP address
+
+```bash
 guest-ipaddress 192.168.100.5 netmask 255.255.255.0
+```
+
+Exit app-hosting configuration
+
+```bash
 exit
+```
+
+Set default gateway for guest
+
+```bash
 app-default-gateway 192.168.100.1 guest-interface 0
+```
+
+Set DNS server for guest
+
+```bash
 name-server0 8.8.8.8
+```
+
+Exit configuration mode
+
+```bash
 end
-guest shell enable
+```
+
+Enable guestshell functionality
+
+```bash
+guestshell enable
+```
 
 Access shell
 

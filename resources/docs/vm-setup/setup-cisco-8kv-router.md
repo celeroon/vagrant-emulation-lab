@@ -230,3 +230,91 @@ Save configuration
 end
 wr
 ```
+
+To configure IPSec VPN (policy based) to HQ (FortiGate) submit those commands on the branch router
+
+Define keyring with remote peer and pre-shared key
+
+```bash
+crypto ikev2 keyring KR-S2S
+ peer PEER1
+  address 192.0.2.6
+  pre-shared-key vagrant
+  exit
+exit
+```
+
+Define IKEv2 proposal with chosen encryption, integrity, and DH group
+
+```bash
+crypto ikev2 proposal PR-S2S
+ encryption des
+ integrity sha1
+ group 2
+ exit
+exit
+```
+
+Create IKEv2 policy binding local address with proposal
+
+```bash
+crypto ikev2 policy PL-S2S
+ match address local 100.64.0.6
+ proposal PR-S2S
+exit
+```
+
+Access-list defining interesting traffic between local and remote subnets
+
+```bash
+ip access-list extended ACL-S2S
+ permit ip 172.30.10.0 0.0.0.255 172.16.20.0 0.0.0.255
+exit
+```
+
+Define IPsec transform set for Phase 2 negotiation
+
+```bash
+crypto ipsec transform-set TS-S2S esp-des esp-sha-hmac
+exit
+```
+
+Define IKEv2 profile with authentication and keyring
+
+```bash
+crypto ikev2 profile PROF-S2S
+ match identity remote address 192.0.2.6
+ identity local address 100.64.0.6
+ authentication remote pre-share
+ authentication local pre-share
+ keyring local KR-S2S
+exit
+```
+
+Create crypto map with peer, profile, transform set, and ACL
+
+```bash
+crypto map CMAP-S2S 10 ipsec-isakmp
+ set peer 192.0.2.6
+ set pfs group14
+ set security-association lifetime seconds 3600
+ set ikev2-profile PROF-S2S
+ set transform-set TS-S2S
+ match address ACL-S2S
+exit
+```
+
+Apply crypto map to interface
+
+```bash
+interface GigabitEthernet2
+ crypto map CMAP-S2S
+exit
+```
+
+Save configuration
+
+```bash
+end
+wr
+```

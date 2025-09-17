@@ -34,7 +34,6 @@ cd $HOME/vagrant-libvirt-labs
 - [Setup iptables](#setup-iptables)
 - [Install Guacamole](#install-guacamole)
 - [Disable offload](#disable-offload)
-- [Build Windows 11/2025 box](#build-windows-112025-box)
 
 ## Install RDP with Xrdp
 

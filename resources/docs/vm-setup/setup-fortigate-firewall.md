@@ -88,6 +88,19 @@ On FortiGate 7.2.0 (or older), the policy will look like this
     <img alt="FortiGate Policies" src="/resources/images/fortigate/policy3.png" width="100%">
 </div>
 
+Complete the firewall policy on FortiGate 7.2.0 (or older) as shown below.
+
+<div align="center">
+    <img alt="FortiGate Policies" src="/resources/images/fortigate/policy4.png" width="100%">
+</div>
+
+Remember, if you are using newer versions, you need to create **two policies**:
+
+1. The first policy — source interface: `vlan10`, destination: `sdwan` interface with NAT enabled.
+2. The second policy — you can experiment with `any <-> any` interfaces with NAT disabled.
+
+Alternatively, you can create a rule from `ipsec-vpn` to `vlan10` to test one-way connectivity, and then replace `vlan10` with `ipsec-vpn` for testing, due to firewall policy limitations in newer FortiOS versions.
+
 To collect logs from FortiGate in ELK, configure syslog via the CLI
 
 ```bash

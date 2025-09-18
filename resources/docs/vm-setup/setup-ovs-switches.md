@@ -1,8 +1,8 @@
 # Setup Open vSwitches
 
-In this section we will setup OVS switches in the HQ based on [topology](/resources/images/vagrant-lab-virtual-topology.svg). OVS supports a lot of advanced features that can be used later in this lab, such as mirorring traffic and NetFlow. Remember that you can replace box name in any of those switches if you want to test integration from diferent vendors. 
+In this section, we will set up OVS switches in the HQ based on the [topology](/resources/images/vagrant-lab-virtual-topology.svg). OVS supports many advanced features that can be used later in this lab, such as traffic mirroring and NetFlow. Remember that you can replace the box name in any of these switches if you want to test integration with different vendors.
 
-I want to leave here ovs-vsctl commands as an example for simple configuration. This commands will not be used in this setup, but rather as a reference. We will create persist configuration right away.
+I want to leave the `ovs-vsctl` commands here as an example of a simple configuration. These commands will not be used in this setup, but rather as a reference. We will create a persistent configuration right away.
 
 Bring up interfaces from eth1 to eth8
 
@@ -61,18 +61,18 @@ sudo ovs-vsctl add-port br0 eth8 \
   -- set port eth8 tag=10
 ```
 
-We can also create SVI interface with IP address
+Create SVI interface with IP address
 
 ```
 sudo ovs-vsctl add-port br0 vlan10 \
   -- set interface vlan10 type=internal \
   -- set port vlan10 tag=10
-```
-
-Bring it up interface: 
-
-```
 sudo ip addr add 172.16.10.253/24 dev vlan10
+```
+
+Bring up interface: 
+
+```
 sudo ip link set vlan10 up
 ```
 
@@ -84,7 +84,7 @@ Run VM
 vagrant up ovs-core-1
 ```
 
-Access VM by name using vagrant ssh or via management IP displayed on [topology](/resources/images/vagrant-lab-virtual-topology.svg)
+Access VM by name using `vagrant ssh` or via management IP shown in the [topology](/resources/images/vagrant-lab-virtual-topology.svg)
 
 ```bash
 vagrant ssh ovs-core-1
@@ -104,7 +104,7 @@ sudo systemctl enable openvswitch-switch
 sudo systemctl start openvswitch-switch
 ```
 
-Configure full networking by code below
+Configure the full networking using the code below
 
 ```bash
 cat <<'EOF' | sudo tee /etc/network/interfaces > /dev/null
@@ -198,7 +198,7 @@ Run VM
 vagrant up ovs-servers-1
 ```
 
-Access VM by name using vagrant ssh or via management IP displayed on [topology](/resources/images/vagrant-lab-virtual-topology.svg)
+Access VM by name using `vagrant ssh` or via management IP shown in the [topology](/resources/images/vagrant-lab-virtual-topology.svg)
 
 ```bash
 vagrant ssh ovs-servers-1
@@ -218,7 +218,7 @@ sudo systemctl enable openvswitch-switch
 sudo systemctl start openvswitch-switch
 ```
 
-Configure full networking by code below
+Configure the full networking using the code below
 
 ```bash
 cat <<'EOF' | sudo tee /etc/network/interfaces > /dev/null
@@ -432,7 +432,7 @@ Run VM
 vagrant up ovs-users-1
 ```
 
-Access VM by name using vagrant ssh or via management IP displayed on [topology](/resources/images/vagrant-lab-virtual-topology.svg)
+Access VM by name using `vagrant ssh` or via management IP shown in the [topology](/resources/images/vagrant-lab-virtual-topology.svg)
 
 ```bash
 vagrant ssh ovs-users-1
@@ -666,7 +666,7 @@ Run VM
 vagrant up ovs-dmz-1
 ```
 
-Access VM by name using vagrant ssh or via management IP displayed on [topology](/resources/images/vagrant-lab-virtual-topology.svg)
+Access VM by name using `vagrant ssh` or via management IP shown in the [topology](/resources/images/vagrant-lab-virtual-topology.svg)
 
 ```bash
 vagrant ssh ovs-dmz-1

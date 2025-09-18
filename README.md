@@ -18,7 +18,6 @@ The topology of this project will change from time to time. I will add new guide
 * [Requirements](/resources/docs/lab-requirements.md)
 * [Host setup (Debian based system)](/resources/docs/host-debian-setup.md)
 * [Build FortiGate Vagrant (libvirt) box](/resources/docs/vagrant-libvirt/build-fortigate-vagrant-libvirt-box.md)
-<!-- * [Build NethSecurity firewall Vagrant (libvirt) box](/resources/docs/vagrant-libvirt/build-nethsecurity-firewall-vagrant-libvirt-box.md) -->
 * [Build Cisco cat8kv Vagrant (libvirt) box](/resources/docs/vagrant-libvirt/build-cisco-cat8kv-vagrant-libvirt-box.md)
 * [Build Windows 11/2025 Vagrant (libvirt) box](/resources/docs/vagrant-libvirt/build-windows-11-2025-libvirt-box.md)
 
@@ -27,18 +26,19 @@ The topology of this project will change from time to time. I will add new guide
 * [VyOS router](/resources/docs/vm-setup/setup-vyos-router.md)
 * [Cisco Catalyst 8kv router](/resources/docs/vm-setup/setup-cisco-8kv-router.md)
 * [FortiGate firewall](/resources/docs/vm-setup/setup-fortigate-firewall.md)
-<!-- * [Nethsecurity firewall](/resources/docs/vm-setup/setup-nethsecurity-firewall.md) -->
 * [Open vSwitch](/resources/docs/vm-setup/setup-ovs-switches.md)
 * [Cumulus switch](/resources/docs/vm-setup/setup-cumulus-switches.md)
 * [ELK](/resources/docs/vm-setup/setup-elk.md)
 * [Velociraptor](/resources/docs/vm-setup/setup-velociraptor.md)
 * [n8n](/resources/docs/vm-setup/setup-n8n.md)
 * [DFIR-IRIS](/resources/docs/vm-setup/setup-dfir-iris.md)
-<!-- * [Windows server](/resources/docs/vm-setup/setup-windows-server.md) -->
 * [NAS](/resources/docs/vm-setup/setup-nas.md)
 * [Kali Linux](/resources/docs/vm-setup/setup-kali-linux.md)
-<!-- * [Payload server](/resources/docs/vm-setup/setup-payload-server.md) -->
 * [Email server](/resources/docs/vm-setup/setup-email-server.md)
 * [C2 server](/resources/docs/vm-setup/setup-c2-server.md)
 * [Windows workstation](/resources/docs/vm-setup/setup-windows-workstation.md)
 * [Branch host](/resources/docs/vm-setup/setup-branch-host.md)
+<!-- * [Build NethSecurity firewall Vagrant (libvirt) box](/resources/docs/vagrant-libvirt/build-nethsecurity-firewall-vagrant-libvirt-box.md) -->
+<!-- * [Payload server](/resources/docs/vm-setup/setup-payload-server.md) -->
+<!-- * [Windows server](/resources/docs/vm-setup/setup-windows-server.md) -->
+<!-- * [Nethsecurity firewall](/resources/docs/vm-setup/setup-nethsecurity-firewall.md) -->

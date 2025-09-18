@@ -231,7 +231,7 @@ end
 wr
 ```
 
-To configure IPSec VPN (policy based) to HQ (FortiGate) submit those commands on the branch router
+To configure a policy-based IPsec VPN to the HQ FortiGate, run these commands on the branch router.
 
 Define keyring with remote peer and pre-shared key
 

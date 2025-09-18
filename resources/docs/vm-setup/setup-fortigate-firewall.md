@@ -176,3 +176,34 @@ To view IPsec VPN tunnel statistics, add the **IPsec** widget to the *Status* pa
 <div align="center">
     <img alt="IPSec widget" src="/resources/images/fortigate/ipsec-widget.png" width="100%">
 </div>
+
+As one of the ways to analyze traffic, we will deploy **NetFlow** and create rules based on it. Open the CLI in FortiGate and run the following commands:
+
+```bash
+config system netflow
+set collector-ip 172.16.10.5
+set collector-port 9012
+set source-ip 172.16.10.254
+set active-flow-timeout 60
+set inactive-flow-timeout 15
+set template-tx-timeout 60
+set template-tx-counter 20
+end
+```
+
+You can change the IP address and port if you are using a different lab schema.
+
+In the same CLI session, you need to attach the NetFlow sampler in both directions for each interface. In newer FortiGate versions, you attach it only to **SERVERS (vlan10)**, but in older versions you attach it to all of them:
+
+```bash
+config system interface
+edit "SERVERS"
+set netflow-sampler both
+next
+edit "USERS"
+set netflow-sampler both
+next
+edit "DMZ"
+set netflow-sampler both
+end
+```

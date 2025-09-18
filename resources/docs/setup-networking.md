@@ -1,6 +1,6 @@
 # Universal guide to setup VM networking on all Linux based VMs
 
-Open [topology](/resources/images/vagrant-lab-virtual-topology.svg) and define variables below with replacing IP address for VM MGMT_IP and LAB_IP 
+Open the [topology](/resources/images/vagrant-lab-virtual-topology.svg) and define the variables below, replacing the IP address for `VM_MGMT_IP` and `LAB_IP`.
 
 ```bash
 MGMT_IP="192.168.225.11"

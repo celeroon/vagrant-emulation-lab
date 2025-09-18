@@ -58,18 +58,19 @@ Configure default route
 ip route 0.0.0.0 0.0.0.0 GigabitEthernet2 100.64.0.1
 ```
 
-Configure extended ACL for NAT
+Configure extended ACL for NAT (with NAT exempt for S2S connection)
 
 ```bash
-ip access-list extended NAT_ACL
-permit ip 172.30.10.0 0.0.0.255 any
+ip access-list extended ACL-NAT
+ 10 denyip 172.30.10.0 0.0.0.255 172.16.20.0 0.0.0.255
+ 30 permit ip 172.30.10.0 0.0.0.255 any
 exit
 ```
 
 Configure NAT
 
 ```bash
-ip nat inside source list NAT_ACL interface GigabitEthernet2 overload
+ip nat inside source list ACL-NAT interface GigabitEthernet2 overload
 ```
 
 To configure DHCP server first you need to exclude router address from DHCP:
@@ -132,18 +133,33 @@ Enable IOX (IOX eXtensions) for container support
 iox
 ```
 
-Create standard ACL for NAT translation
+Create ACL for NAT to access the Internet
 
 ```bash
-ip access-list standard IOX_NAT
-permit 192.168.100.0 0.0.0.255
+ip access-list extended IOX_TO_INTERNET
+ 10 permit ip 192.168.100.0 0.0.0.255 any
 exit
+```
+
+Create ACL for NAT to access the remote network
+
+```bash
+ip access-list extended IOX_TO_REMOTE
+ 10 permit ip 192.168.100.0 0.0.0.255 172.16.20.0 0.0.0.255
+exit
+```
+
+Create a NAT pool with the single LAN IP to translate container network to LAN network
+
+```bash
+ip nat pool IOX_TO_LAN 172.30.10.254 172.30.10.254 netmask 255.255.255.0
 ```
 
 Configure NAT overload on Gi2
 
 ```bash
-ip nat inside source list IOX_NAT interface GigabitEthernet2 overload
+ip nat inside source list IOX_TO_REMOTE pool IOX_TO_LAN overload
+ip nat inside source list IOX_TO_INTERNET interface GigabitEthernet2 overload
 ```
 
 Enter virtual port group interface
@@ -268,7 +284,7 @@ Access-list defining interesting traffic between local and remote subnets
 
 ```bash
 ip access-list extended ACL-S2S
- permit ip 172.30.10.0 0.0.0.255 172.16.20.0 0.0.0.255
+ 10 permit ip 172.30.10.0 0.0.0.255 172.16.20.0 0.0.0.255
 exit
 ```
 

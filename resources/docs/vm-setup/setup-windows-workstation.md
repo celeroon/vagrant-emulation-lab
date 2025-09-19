@@ -1,40 +1,54 @@
 # Setup Windows Workstation
 
-Based on your choise to use Windows 10 or Windows 11 in the initial host setup stage - you need to modify the `node.vm.box` in the file location `vms/windows/users/config.rb`. Use `vagrant box list` command to identify your Windows box name. By default I will use Windows 11 box (`windows-11-24h2-amd64`).
+Based on your choice to use Windows 10 or Windows 11 in the initial host setup stage, you need to modify the `node.vm.box` in `vms/windows/users/config.rb`. Use the `vagrant box list` command to identify your Windows box name. By default, I will use the Windows 11 box (`windows-11-24h2-amd64`).
 
-Run VM (there are two VM predifind: win-user-1 and win-user-2)
+Run the VM (two VMs are predefined: `win-user-1` and `win-user-2`):
 
 ```bash
 vagrant up win-user-1
 ```
 
-While you wait for Windows VM initialization you can configure [Guacamole using instrcutions](/resources/docs/setup-guacamole.md)
+While you wait for the Windows VM to initialize, you can configure [Guacamole using these instructions](/resources/docs/setup-guacamole.md).
 
-Alternativly you can you xfree rdp from localhost to the Windows VM, firsly you need to install service `sudo apt install freerdp2-x11` and use command below to connect to the VM
+Alternatively, you can use FreeRDP from localhost to connect to the Windows VM. First, install the service:
+
+```bash
+sudo apt install freerdp2-x11
+```
+
+Then use the command below to connect to the VM:
 
 ```bash
 xfreerdp /u:vagrant /p:vagrant /v:192.168.225.21 /monitors:0 /multimon /port:3389
 ```
 
-After you get access to the VM change network configuration to remove gateway on the management interaface. Select appropriate network card and edit settings.
+After you get access to the VM, change the network configuration to remove the gateway on the management interface. Select the appropriate network card and edit its settings.
 
 <div align="center">
     <img alt="Windows network configuration" src="/resources/images/windows/workstation-network-properties.png" width="100%">
-</div>
+</div>  
 
-Refresh guacamole page because you will lost connection after changing network configuration. From main host working directory transfer `elasticsearch-ca.pem` to C:\ drive (if you have multiple Windows VM remember to change IP address)
+Refresh the Guacamole page, because you will lose connection after changing the network configuration.
+
+From the main host working directory, transfer `elasticsearch-ca.pem` to the `C:\` drive (if you have multiple Windows VMs, remember to change the IP address):
 
 ```bash
 scp -i ~/.vagrant.d/insecure_private_key ./ansible/artifacts/elasticsearch-ca.pem vagrant@192.168.225.21:/c:/elasticsearch-ca.pem
 ```
 
-Add certificate to trust store
+Also tranfer the velociraptor executable
+
+```bash
+scp -i ~/.vagrant.d/insecure_private_key ./ansible/artifacts/velociraptor.exe vagrant@192.168.225.21:/c:/velociraptor.exe
+```
+
+Add the certificate to the trust store:
 
 ```powershell
 certutil -addstore -f "Root" "C:\elasticsearch-ca.pem"
 ```
 
-On the Windows VM we will use Chocolatey to isntall required software. First we ween to install tool. I recommend to use Google Chrome browser to easly coppy and paste commands to the VM. I recommend to open powershell as Administrator to run commands below. 
+On the Windows VM we will use **Chocolatey** to install the required software. First, install Chocolatey itself. I recommend using Google Chrome to easily copy and paste commands to the VM. Open PowerShell as Administrator and run the following commands:
 
 ```powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force
@@ -42,13 +56,14 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 ```
 
-Install software via Chocolatey
+Install software via Chocolatey:
 
 ```powershell
 choco install git -y
+choco install python --version=3.12.4 -y
 choco install sysmon --version=15.14.0 --ignore-checksums -y
 choco install filezilla -y
-choco install googlechrome --version=134.0.6998.166 --ignore-checksums -y
+choco install googlechrome
 choco install firefox -y
 choco install visualstudio2019buildtools -y
 choco install vcredist140 -y
@@ -56,7 +71,7 @@ choco install visualcpp-build-tools -y
 choco install 7zip -y
 ```
 
-Add Python to PATH (machine-wide)
+Add Python to PATH (machine-wide):
 
 ```powershell
 $currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
@@ -64,19 +79,32 @@ $newPath = $currentPath + ";C:\Python312;C:\Python312\Scripts"
 [Environment]::SetEnvironmentVariable("Path", $newPath, "Machine")
 ```
 
-Next step is to configure logging on a Windows VM. Create the Registry Key for Script Block Logging
+The next step is to configure logging. Visit this page to [configure module logging for PowerShell](https://docs.splunk.com/Documentation/UBA/5.4.3/GetDataIn/AddPowerShell).
+
+<!-- Next, configure logging on the Windows VM. Enable Script Block Logging -> Event ID 4104 in PowerShell/Operational:
 
 ```powershell
-New-Item -Path "HKLM:\SOFTWARE\Wow6432Node\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Force
+#New-Item -Path "HKLM:\SOFTWARE\Wow6432Node\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Force
+New-Item -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging' -Force
+New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging' -Name EnableScriptBlockLogging -Value 1 -PropertyType DWord -Force
 ```
 
-Enable Script Block Logging
+Enable Module Logging -> Event ID 4103:
 
 ```powershell
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -Name "EnableScriptBlockLogging" -Value 1 -Force
+New-Item -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging' -Force
+New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging' -Name EnableModuleLogging -Value 1 -PropertyType DWord -Force
+New-Item -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging\ModuleNames' -Force
+New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging\ModuleNames' -Name '*' -Value '*' -PropertyType String -Force
 ```
 
-Next step is to change audit policy. You can copy and paste full script or create a powershell script file and transfer it via scp. Audit settings are based on [this baseline](https://github.com/celeroon/win-audit-policy-settings)
+Ensure the event channel is enabled
+
+```powershell
+C:\Windows\System32\wevtutil.exe sl "Microsoft-Windows-PowerShell/Operational" /e:true
+``` -->
+
+Update the audit policy. You can copy and paste the full script or create a PowerShell script file and transfer it via SCP. Audit settings are based on [this baseline](https://github.com/celeroon/win-audit-policy-settings):
 
 ```powershell
 $AuditSettings = @{
@@ -133,20 +161,21 @@ foreach ($Subcategory in $AuditSettings.Keys) {
 Write-Host "Audit policies updated successfully!" -ForegroundColor Green
 ```
 
-## ================== ##
-# ==================== #
-# Install velociraptor #
-# ==================== #
-## ================== ##
+Install Velociraptor service
 
-Download Sysmon config
+```powershell
+C:\velociraptor.exe service install
+```
+
+Default usernames/passwords are preconfigured: `vagrant` / `vagrant`. Access Velociraptor at: `https://172.16.10.8:8889`
+
+Download Sysmon config:
 
 ```powershell
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/olafhartong/sysmon-modular/master/sysmonconfig.xml" -OutFile "C:\sysmonconfig.xml"
 ```
 
-Lets clear logs before Sysmon installation
-
+Clear logs before Sysmon installation:
 
 ```powershell
 $logs = Get-EventLog -List
@@ -166,24 +195,34 @@ foreach ($log in $logs) {
 Write-Host "Log clearing process completed."
 ```
 
-To install Sysmon run command below
+Install Sysmon:
 
 ```powershell
 C:\ProgramData\chocolatey\lib\sysmon\tools\sysmon64.exe -i C:\sysmonconfig.xml -accepteula
 ```
 
-To install Elastic Agent navigate to the `https://172.16.10.5:5601` and go to the Fleet section. You will see `Add agent` blue button. After you click it - select `Windows-Policy` and on the bottom you will see script for `Windows x86_64`. Copy this code and paste to the powershell (with Admin rights) and append `--force` to this script or just access `Y` during installation. You will see your Windows VM in the Fleet server section.
+To install Elastic Agent, go to `https://172.16.10.5:5601` and navigate to the **Fleet** section. Click the **Add agent** button, select **Windows-Policy**, and at the bottom copy the script for `Windows x86_64`. Paste it into PowerShell (run as Administrator) and append `--force` to the command, or press `Y` during installation. After installation, you will see your Windows VM in the Fleet server section.
 
 <div align="center">
     <img alt="Windows Elastic Agent" src="/resources/images/windows/elastic-agent.png" width="100%">
-</div>
+</div>  
 
-It is recommended to update installed agent policies nativating to `Fleet -> Agent policies -> Windows Policy`. In the `System` integration you can disable collecting Windows metrics if you want to save more space on ELK VM.
+It is recommended to update installed agent policies by navigating to `Fleet -> Agent policies -> Windows Policy`. In the `System` integration you can disable collecting Windows metrics if you want to save space on the ELK VM.
 
-Nativate to the `Fleet-Server-Policy` and on the right corner click `Add Integration`. Search for `NetFlow Records` and change `localhost` to the `0.0.0.0` and also UDP port from `2055` to `9012`. 
+You may faced with `Unhealthy` status on Windows VM because it does not see Sysmon/Operational channel, you can reboot VM to fix it. 
 
-Now you can analyze dashboards for search `FortiGate` or `NetFlow` and check them.
+Navigate to the `Fleet-Server-Policy` and in the top-right corner click **Add Integration**. Search for **NetFlow Records** and change `localhost` to `0.0.0.0` and the UDP port from `2055` to `9012`.
+
+In the same `Fleet-Server-Policy`, install another integration — **Cisco IOS**. Disable collecting logs via TCP and for UDP change the host to `0.0.0.0` and the port to `9010`.
+
+Now you can analyze dashboards by searching for **FortiGate** or **NetFlow** and review them.
 
 <div align="center">
     <img alt="Elasticsearch Kibana NetFlow" src="/resources/images/windows/netflow-records.png" width="100%">
-</div>
+</div>  
+
+To find branch Cisco router logs, open **Discover** and search for example:
+
+```
+data_stream.dataset: "cisco_ios.log"
+```

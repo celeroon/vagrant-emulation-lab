@@ -108,7 +108,7 @@ config log syslogd setting
  set status enable
  set server 172.16.10.10
  set port 5145
- set source-ip 192.168.20.254
+ set source-ip 172.16.10.254
  set format rfc5424
 end
 ```

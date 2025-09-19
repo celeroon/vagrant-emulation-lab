@@ -154,10 +154,15 @@ Remember to enable **SNMP** in the interface *Administrative Access* settings â€
   * On FortiGate 7.2.0 or older, set it to the user network `172.16.20.0/24`.
   * The Remote Network must be the branch network `172.30.10.0/24`.
 * For the Phase 2 proposal, again keep only one option for encryption and authentication: `DES` and `SHA1`. Set DH Group to `2` and change *Seconds* to `3600`.
+* In deployments with FortiGate 7.2.0 or older, create the same selector but for the servers network `172.16.10.0/24`.
+
+<div align="center">
+    <img alt="FortiGate IPsec Tunnel" src="/resources/images/fortigate/ipsec-tunnel.png" width="100%">
+</div>
 
 **Now create Firewall Policies.** With Site-to-Site VPN you need to define multiple rules. Make sure that the *multiple interfaces* feature is enabled.
 
-* Allow traffic between the remote network and the local user network (NAT disabled).
+* Allow traffic between the remote network and the local users and servers network (NAT disabled).
 * If you clone an existing rule, make sure to enable it.
 * In all cases, ensure that **All Sessions** is enabled for *Log Allowed Traffic*.
 

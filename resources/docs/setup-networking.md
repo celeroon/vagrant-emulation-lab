@@ -16,13 +16,13 @@ iface lo inet loopback
 
 auto eth0
 iface eth0 inet static
-  address <MGMT_IP>
+  address $MGMT_IP
   netmask 255.255.255.0
   pre-up sleep 2
 
 auto eth1
-iface eth1 inet dhcp
-  address <LAB_IP>
+iface eth1 inet static
+  address $LAB_IP
   netmask 255.255.255.0
   gateway 172.16.10.254
   dns-nameservers 8.8.8.8

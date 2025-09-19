@@ -78,3 +78,9 @@ Build and run:
 docker compose build
 docker compose up -d
 ```
+
+Copy `elasticsearch-ca.pem` for Elastic Agents (run command on the main host working directory)
+
+```bash
+scp -i ~/.vagrant.d/insecure_private_key vagrant@192.168.225.105:/home/vagrant/docker-compose-elastic-stack/certs/elasticsearch-ca.pem ansible/artifacts/
+```

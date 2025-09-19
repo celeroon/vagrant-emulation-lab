@@ -62,7 +62,8 @@ Configure extended ACL for NAT (with NAT exempt for S2S connection)
 
 ```bash
 ip access-list extended ACL-NAT
- 10 denyip 172.30.10.0 0.0.0.255 172.16.20.0 0.0.0.255
+ 10 deny ip 172.30.10.0 0.0.0.255 172.16.20.0 0.0.0.255
+ 20 deny ip 172.30.10.0 0.0.0.255 172.16.10.0 0.0.0.255
  30 permit ip 172.30.10.0 0.0.0.255 any
 exit
 ```
@@ -87,6 +88,18 @@ network 172.30.10.0 255.255.255.0
 default-router 172.30.10.254
 dns-server 8.8.8.8
 exit
+```
+
+Set up the timezone, for example CET. Set the default timezone to CET (UTC+1):
+
+```bash
+clock timezone CET 1
+```
+
+Configure summer time (CEST = CET+1)
+
+```bash
+clock summer-time CEST recurring last Sun Mar 2:00 last Sun Oct 3:00
 ```
 
 Enable syslog logging
@@ -285,6 +298,7 @@ Access-list defining interesting traffic between local and remote subnets
 ```bash
 ip access-list extended ACL-S2S
  10 permit ip 172.30.10.0 0.0.0.255 172.16.20.0 0.0.0.255
+ 20 permit ip 172.30.10.0 0.0.0.255 172.16.10.0 0.0.0.255
 exit
 ```
 
@@ -312,7 +326,7 @@ Create crypto map with peer, profile, transform set, and ACL
 ```bash
 crypto map CMAP-S2S 10 ipsec-isakmp
  set peer 192.0.2.6
- set pfs group14
+ set pfs group2
  set security-association lifetime seconds 3600
  set ikev2-profile PROF-S2S
  set transform-set TS-S2S

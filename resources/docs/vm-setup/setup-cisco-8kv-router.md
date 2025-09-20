@@ -168,6 +168,20 @@ Create a NAT pool with the single LAN IP to translate container network to LAN n
 ip nat pool IOX_TO_LAN 172.30.10.254 172.30.10.254 netmask 255.255.255.0
 ```
 
+Create route-maps to tie ACLs to specific NAT actions
+(`RM-IOX-REMOTE` ensures VPN traffic is NATed to 172.30.10.254,
+`RM-IOX-INET` ensures Internet traffic is NATed out Gi2)
+
+```bash
+route-map RM-IOX-REMOTE permit 10
+ match ip address IOX_TO_REMOTE
+exit
+
+route-map RM-IOX-INET permit 10
+ match ip address IOX_TO_INTERNET
+exit
+```
+
 Configure NAT overload on Gi2
 
 ```bash

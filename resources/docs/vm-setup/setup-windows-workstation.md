@@ -226,3 +226,7 @@ To find branch Cisco router logs, open **Discover** and search for example:
 ```
 data_stream.dataset: "cisco_ios.log"
 ```
+
+Access the n8n GUI at `https://172.16.10.7` and set up an account. Provide your email address to receive a token that unlocks features for the Community Edition. Click the three dots next to your account in the lower left corner and go to `Settings`. Select `Enter activation key` and submit the token from your email.
+
+The n8n workflows will be presented later in the guidelines.

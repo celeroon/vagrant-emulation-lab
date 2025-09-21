@@ -243,7 +243,7 @@ In the left panel, navigate to the **Storage** section:
 * **File Systems:** Create a new one, select **EXT4**, and in the **Device** section choose the 100GB disk. After creation, in the File Systems section click on *Mount an existing file system* (the play/start icon), select the disk, and click **Save**, then apply the pending configuration.
 * **Shared Folders:** Enter a name for the shared folder (for example *lab*), select the file system you just created, the relative path will be filled automatically. For lab usage, leave the default permissions (*Admin: r/w, Users: r/w, Others: ro*). Save and apply the configuration.
 
-Next, in the left panel go to **Services -> SMB/CIFS -> Settings**. At the top of the page, enable SMB, then save and apply changes.
+Next, in the left panel go to **Services -> SMB/CIFS -> Settings**. At the top of the page, enable SMB, and for lab purposes I will switch to the SMB1 version, then save and apply changes.
 
 In the **Shares** section, create a new share and select the previously created folder (*lab*). Additionally, enable *Audit file operations*. Save and apply changes.
 

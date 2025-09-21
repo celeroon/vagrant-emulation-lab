@@ -4,6 +4,9 @@ Open the [topology](/resources/images/vagrant-lab-virtual-topology.svg) and defi
 
 ```bash
 MGMT_IP="192.168.225.11"
+```
+
+```bash
 LAB_IP="172.16.10.10"
 ```
 

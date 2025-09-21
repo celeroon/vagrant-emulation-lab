@@ -3,6 +3,9 @@ Install Docker
 
 ```bash
 curl -fsSl https://get.docker.com -o get-docker.sh
+```
+
+```bash
 sh get-docker.sh
 ```
 

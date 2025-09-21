@@ -289,6 +289,7 @@ Download required vagrant boxes
 
 ```bash
 vagrant box add --provider libvirt generic-x64/debian11
+vagrant box add --provider libvirt generic-x64/debian12
 vagrant box add --provider libvirt vyos/current
 vagrant box add --provider libvirt aarna/cumulus-vx-5.11.1
 vagrant box add --provider libvirt joaobrlt/ubuntu-desktop-24.04

@@ -232,3 +232,30 @@ Access the n8n GUI at `https://172.16.10.7` and set up an account. Provide your 
 The n8n workflows will be presented later in the guidelines.
 
 You can open a new tab to access DFIR-IRIS at `https://172.16.10.6` using the default credentials `administrator` / `vagrant`, if you followed the lab setup guide.
+
+To set up **OpenMediaVault**, go to `http://172.16.20.100` and log in with the default credentials: `admin` / `openmediavault`.
+
+At the start, you will be prompted to configure the dashboard. You can simply enable all widgets and save them.
+
+In the left panel, navigate to the **Storage** section:
+
+* **Disks:** Click on `dev/vdb (100GB)` and wipe it.
+* **File Systems:** Create a new one, select **EXT4**, and in the **Device** section choose the 100GB disk. After creation, in the File Systems section click on *Mount an existing file system* (the play/start icon), select the disk, and click **Save**, then apply the pending configuration.
+* **Shared Folders:** Enter a name for the shared folder (for example *lab*), select the file system you just created, the relative path will be filled automatically. For lab usage, leave the default permissions (*Admin: r/w, Users: r/w, Others: ro*). Save and apply the configuration.
+
+Next, in the left panel go to **Services -> SMB/CIFS -> Settings**. At the top of the page, enable SMB, then save and apply changes.
+
+In the **Shares** section, create a new share and select the previously created folder (*lab*). Additionally, enable *Audit file operations*. Save and apply changes.
+
+Go to **Users -> Users**, create a new user (for example *bob*), set and confirm the password, and select only the **user** group. Save. Then click on the *bob* user and go to **Shared folder permissions**. Since you only created one shared folder (*lab*), set its permissions to *Read/Write*. Save and apply.
+
+Now, open Windows Explorer. You can:
+
+* Go to the **Network** section (after enabling discovery) to find the NAS, named `NAS-1`, or
+* Directly enter `\\172.16.20.100\lab` in the Explorer search bar.
+
+You will be prompted for credentials — use the user account you created earlier.
+
+<div align="center">  
+    <img alt="Windows network share" src="/resources/images/windows/nas-1.png" width="100%">  
+</div>  

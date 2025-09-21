@@ -229,6 +229,8 @@ data_stream.dataset: "cisco_ios.log"
 
 Access the n8n GUI at `https://172.16.10.7` and set up an account. Provide your email address to receive a token that unlocks features for the Community Edition. Click the three dots next to your account in the lower left corner and go to `Settings`. Select `Enter activation key` and submit the token from your email.
 
+Move back to the `Fleet-Server-Policy` integration tab and install `Custom UDP logs`. Change listen address to `0.0.0.0` and port to `9013`. Optionally you can change default namespace or integratio name, to something like `nas`. 
+
 The n8n workflows will be presented later in the guidelines.
 
 You can open a new tab to access DFIR-IRIS at `https://172.16.10.6` using the default credentials `administrator` / `vagrant`, if you followed the lab setup guide.
@@ -243,9 +245,153 @@ In the left panel, navigate to the **Storage** section:
 * **File Systems:** Create a new one, select **EXT4**, and in the **Device** section choose the 100GB disk. After creation, in the File Systems section click on *Mount an existing file system* (the play/start icon), select the disk, and click **Save**, then apply the pending configuration.
 * **Shared Folders:** Enter a name for the shared folder (for example *lab*), select the file system you just created, the relative path will be filled automatically. For lab usage, leave the default permissions (*Admin: r/w, Users: r/w, Others: ro*). Save and apply the configuration.
 
-Next, in the left panel go to **Services -> SMB/CIFS -> Settings**. At the top of the page, enable SMB, and for lab purposes I will switch to the SMB1 version, then save and apply changes.
+Next, in the left panel go to **Services -> SMB/CIFS -> Settings**. At the top of the page, enable SMB, and for lab purposes I will switch to the SMB1 version. Also log level settings must be `None`, then save and apply changes.
 
-In the **Shares** section, create a new share and select the previously created folder (*lab*). Additionally, enable *Audit file operations*. Save and apply changes.
+In the **Shares** section, create a new share and select the previously created folder (*lab*). Additionally, enable *Audit file operations* and in the *Extra Options* put code below. Save and apply changes:
+
+```bash
+vfs objects = full_audit
+full_audit:priority = NOTICE
+full_audit:facility = DAEMON
+full_audit:failure = connect
+full_audit:success = connect disconnect unlinkat renameat mkdirat openat close read write
+full_audit:prefix = %u|%I|%m|%S
+```
+
+(Optional) You can test applied parameters in the CLI
+
+```bash
+testparm -s
+```
+
+(Optional) Restart Samba
+
+```bash
+sudo systemctl restart smbd nmbd
+```
+
+In the left pannel go to the `Diagnostics` -> `System Logs` -> `Remote` and put host as `172.16.10.5` and port `9013`. Save and apply changes. 
+
+Create rsyslog rule for `smbd_audit` in the CLI (connect via SSH to the VM)
+
+```bash
+sudo tee /etc/rsyslog.d/60-smb-audit-forward.conf >/dev/null <<'EOF'
+if ($programname == "smbd_audit") then @@172.16.10.5:9013
+EOF
+```
+
+Reload rsyslog
+
+```bash
+sudo systemctl restart rsyslog
+```
+
+Send a test message
+
+```bash
+logger -p daemon.notice -t smbd_audit "TEST audit forward"
+```
+
+You can debug audit
+
+```bash
+journalctl -f | grep -i smbd_audit`
+```
+
+Kibana filters that will be used in our lab to build queris (just as a reference)
+
+* Definitive delete:
+
+```bash
+message: ("smbd_audit" AND "|unlinkat|")
+```
+
+* “Content change intent” (write open):
+
+```bash
+message: ("smbd_audit" AND "|openat|ok|w|")
+```
+
+* If you really need read opens (noisy):
+
+```bash
+message: ("smbd_audit" AND "|openat|ok|r|")
+```
+
+Next, in the left panel go to **Services -> SMB/CIFS -> Settings**. At the top of the page, enable SMB. For lab purposes, switch to **SMB1**. Set the log level to `None`, then save and apply changes.
+
+In the **Shares** section, create a new share and select the previously created folder (*lab*). Additionally, enable *Audit file operations* and in *Extra Options* paste the code below. Save and apply changes:
+
+```bash
+vfs objects = full_audit
+full_audit:priority = NOTICE
+full_audit:facility = DAEMON
+full_audit:failure = connect
+full_audit:success = connect disconnect unlinkat renameat mkdirat openat close read write
+full_audit:prefix = %u|%I|%m|%S
+```
+
+(Optional) Test the applied parameters in the CLI:
+
+```bash
+testparm -s
+```
+
+(Optional) Restart Samba:
+
+```bash
+sudo systemctl restart smbd nmbd
+```
+
+In the left panel, go to **Diagnostics -> System Logs -> Remote** and set the host to `172.16.10.5` and port to `9013`. Save and apply changes.
+
+Create an rsyslog rule for `smbd_audit` in the CLI (connect via SSH to the VM):
+
+```bash
+sudo tee /etc/rsyslog.d/60-smb-audit-forward.conf >/dev/null <<'EOF'
+if ($programname == "smbd_audit") then @@172.16.10.5:9013
+EOF
+```
+
+Reload rsyslog:
+
+```bash
+sudo systemctl restart rsyslog
+```
+
+Send a test message:
+
+```bash
+logger -p daemon.notice -t smbd_audit "TEST audit forward"
+```
+
+Debug audit logs:
+
+```bash
+journalctl -f | grep -i smbd_audit
+```
+
+---
+
+### Kibana filters (for lab queries, reference only):
+
+* **Definitive delete:**
+
+```bash
+message: ("smbd_audit" AND "|unlinkat|")
+```
+
+* **“Content change intent” (write open):**
+
+```bash
+message: ("smbd_audit" AND "|openat|ok|w|")
+```
+
+* **Read opens (very noisy):**
+
+```bash
+message: ("smbd_audit" AND "|openat|ok|r|")
+```
 
 Go to **Users -> Users**, create a new user (for example *bob*), set and confirm the password, and select only the **user** group. Save. Then click on the *bob* user and go to **Shared folder permissions**. Since you only created one shared folder (*lab*), set its permissions to *Read/Write*. Save and apply.
 

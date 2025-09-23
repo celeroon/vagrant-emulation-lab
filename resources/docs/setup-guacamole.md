@@ -16,3 +16,7 @@ Enter the **name** of your new connection to the Windows VM. Change the protocol
 Scroll to the bottom of the page and click **Save**.
 
 In the top-right corner, click **Home**, and on the main page you will see your connections.
+
+## New Kali Linux connection (RDP)
+
+Repeat the same steps as for the Windows RDP setup, but use the Kali Linux management IP: `192.168.225.5`.

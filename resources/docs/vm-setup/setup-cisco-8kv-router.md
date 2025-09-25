@@ -138,9 +138,21 @@ Set syslog facility to local7
 logging facility local7
 ```
 
+Log failed interactive logins (SSH, console, VTY)
+
+```bash
+login on-failure log
+```
+
+Log failed interactive logins
+
+```bash
+login on-success log
+```
+
 In this lab environment, I also want to configure Guestshell on the Cisco router to expose more applications that could be used in adversary emulation scenarios.
 
-Enable IOX (IOX eXtensions) for container support
+Enable IOX (IOX eXtensions) for container support in configuration mode
 
 ```bash
 iox

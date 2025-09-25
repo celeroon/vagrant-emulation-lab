@@ -150,6 +150,17 @@ Log failed interactive logins
 login on-success log
 ```
 
+Enable archive log config
+
+```bash
+conf t
+archive
+ log config
+  logging enable
+  notify syslog
+  hidekeys
+```
+
 In this lab environment, I also want to configure Guestshell on the Cisco router to expose more applications that could be used in adversary emulation scenarios.
 
 Enable IOX (IOX eXtensions) for container support in configuration mode
@@ -306,7 +317,6 @@ crypto ikev2 proposal PR-S2S
  encryption des
  integrity sha1
  group 2
- exit
 exit
 ```
 

@@ -1,0 +1,91 @@
+{
+    "id": "8fc9682d-aeaf-435a-93d8-f5f58306ede5",
+    "name": "Suspicious Configuration Change Sequence on Cisco IOS Device",
+    "tags": [
+        "demo"
+    ],
+    "interval": "1m",
+    "enabled": false,
+    "revision": 1,
+    "description": "This detection identifies a sequence of three key Cisco IOS events within a short time frame: a successful login, a configuration change, and subsequent encryption of the private configuration file. While these actions can occur during normal administrative activity, they may also indicate unauthorized configuration modifications or attempts to persist malicious changes after gaining access.",
+    "risk_score": 73,
+    "severity": "high",
+    "note": "Verify the `source.ip` and `user.name` fields — determine if the login was expected.  \nReview device configuration history (`show running-config` and archived diffs) for unauthorized changes.  ",
+    "license": "https://github.com/SigmaHQ/sigma/blob/master/LICENSE",
+    "output_index": "",
+    "meta": {},
+    "author": [
+        "celeroon"
+    ],
+    "false_positives": [
+        "Routine configuration updates performed by authorized administrators.",
+        "Automated configuration backup or compliance scripts.",
+        "Scheduled infrastructure changes (e.g., via Ansible or Cisco DNA Center)."
+    ],
+    "from": "now-61s",
+    "rule_id": "ed0123aa-1b70-4d70-9cab-0bc3ce878d87",
+    "max_signals": 100,
+    "risk_score_mapping": [],
+    "severity_mapping": [],
+    "threat": [
+        {
+            "framework": "MITRE ATT&CK",
+            "tactic": {
+                "id": "TA0003",
+                "name": "Persistence",
+                "reference": "https://attack.mitre.org/tactics/TA0003/"
+            },
+            "technique": [
+                {
+                    "id": "T1136",
+                    "name": "Create Account",
+                    "reference": "https://attack.mitre.org/techniques/T1136/",
+                    "subtechnique": [
+                        {
+                            "id": "T1136.001",
+                            "name": "Local Account",
+                            "reference": "https://attack.mitre.org/techniques/T1136/001/"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "framework": "MITRE ATT&CK",
+            "tactic": {
+                "id": "TA0001",
+                "name": "Initial Access",
+                "reference": "https://attack.mitre.org/tactics/TA0001/"
+            },
+            "technique": [
+                {
+                    "id": "T1078",
+                    "name": "Valid Accounts",
+                    "reference": "https://attack.mitre.org/techniques/T1078/",
+                    "subtechnique": [
+                        {
+                            "id": "T1078.003",
+                            "name": "Local Accounts",
+                            "reference": "https://attack.mitre.org/techniques/T1078/003/"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "to": "now",
+    "references": [],
+    "version": 1,
+    "exceptions_list": [],
+    "immutable": false,
+    "rule_source": {
+        "type": "internal"
+    },
+    "related_integrations": [],
+    "required_fields": [],
+    "setup": "To simulate this detection for testing:\n1. Log in to a Cisco IOS device via SSH or console.\n2. Make a configuration change (e.g., `conf t` → `interface GigabitEthernet0/1` → `description TEST`).\n3. Save and encrypt the configuration (`write memory`).",
+    "type": "esql",
+    "language": "esql",
+    "query": "FROM logs-* METADATA _id, _version, _index\r\n| WHERE data_stream.dataset == \"cisco_ios.log\"\r\n  AND event.code IN (\"LOGIN_SUCCESS\",\"SYNC_NEEDED\",\"PRIVCFG_ENCRYPT_SUCCESS\")\r\n| EVAL dev = log.source.address\r\n| KEEP @timestamp, source.ip, event.code, message, _id, _version, _index\r\n| SORT @timestamp ASC\r\n",
+    "actions": []
+}

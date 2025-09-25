@@ -4,16 +4,19 @@ Project goal: deploy a virtual infrastructure using automation tools to provide 
 
 The core lab components consist of a firewall (FortiGate), switches (OVS, Cumulus), routers (Cisco 8kv, VyOS), C2, email, and a payload server. On the LAN, the main components are SIEM (ELK), Windows Servers, databases, (web) applications, sandbox, SOAR, DFIR tools and workstations. 
 
+This project will grow with ideas for emulation techniques - both custom and documented. The goal is to follow the MITRE ATT&CK matrix, starting from the initial stages and progressing upward, with examples of how to run scenarios and detect them (rules) using a close to real virtual infrastructure.
+
 ## Lab Topology
 
 The topology of this project will change from time to time. I will add new guides on how to implement new tools in the lab.
-
 
 <div align="center">
     <img alt="Vagrant Lab Virtual Topology" src="/resources/images/vagrant-lab-virtual-topology.svg" width="100%">
 </div>
 
-## Lab setup instructions
+## Manual lab setup
+
+This section provides guidelines for setting up the lab environment manually and can help anyone interested in a step-by-step implementation.
 
 * [Requirements](/resources/docs/lab-requirements.md)
 * [Host setup (Debian based system)](/resources/docs/host-debian-setup.md)
@@ -42,3 +45,29 @@ The topology of this project will change from time to time. I will add new guide
 <!-- * [Payload server](/resources/docs/vm-setup/setup-payload-server.md) -->
 <!-- * [Windows server](/resources/docs/vm-setup/setup-windows-server.md) -->
 <!-- * [Nethsecurity firewall](/resources/docs/vm-setup/setup-nethsecurity-firewall.md) -->
+
+---
+
+## Scenarios (attack and detect)
+
+- **Initial Access**
+    - Network service
+        - [Common service attack](/resources/docs/scenarios/attack-detect/initial-access/network-service/common-service-attack/common-service-attack.md)
+
+---
+
+## Disclaimer
+
+This project is for **educational and research use in a closed, virtual lab environment only**. Do **not** use any techniques, tools, or configurations from this repository against real systems, production networks, or assets you do not own or lack explicit written permission to test. Always comply with all applicable laws, regulations, licenses, and organizational policies.
+The authors and contributors assume **no responsibility or liability** for any misuse, damage, loss of data, service disruption, or legal consequences arising from the use of this material. **No warranty** is provided - use at your own risk.
+
+## Safety & scope
+
+* Do not deploy any part of this lab to production.
+* Use only synthetic/test data and isolated networks.
+* Obtain explicit authorization before any security testing.
+* Review all third-party tool licenses and terms before use.
+
+## Trademarks
+
+All product names, logos, brands, and other trademarks mentioned in this project are the property of their respective owners. Any use of third-party names is for identification purposes only and does **not** imply affiliation, sponsorship, or endorsement. This project is not affiliated with, sponsored by, or endorsed by any vendor or solution referenced.

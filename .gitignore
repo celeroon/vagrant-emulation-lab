@@ -59,6 +59,7 @@ get-docker.sh
 
 # Private keys and certificates
 *.pem
+insecure_private_key
 
 # =============================================================================
 # ARCHIVES & INSTALLERS

@@ -86,6 +86,6 @@
     "setup": "To simulate this detection for testing:\n1. Log in to a Cisco IOS device via SSH or console.\n2. Make a configuration change (e.g., `conf t` → `interface GigabitEthernet0/1` → `description TEST`).\n3. Save and encrypt the configuration (`write memory`).",
     "type": "esql",
     "language": "esql",
-    "query": "FROM logs-* METADATA _id, _version, _index\r\n| WHERE data_stream.dataset == \"cisco_ios.log\"\r\n  AND event.code IN (\"LOGIN_SUCCESS\",\"SYNC_NEEDED\",\"PRIVCFG_ENCRYPT_SUCCESS\")\r\n| EVAL dev = log.source.address\r\n| KEEP @timestamp, source.ip, event.code, message, _id, _version, _index\r\n| SORT @timestamp ASC\r\n",
+    "query": "FROM logs-* METADATA _id, _version, _index\r\n| WHERE data_stream.dataset == \"cisco_ios.log\"\r\n  AND event.code IN (\"LOGIN_SUCCESS\",\"CFGLOG_LOGGEDCMD\",\"SYNC_NEEDED\",\"PRIVCFG_ENCRYPT_SUCCESS\")\r\n| EVAL dev = log.source.address\r\n| KEEP @timestamp, dev, source.ip, event.code, message, _id, _version, _index\r\n| SORT dev, @timestamp ASC",
     "actions": []
 }

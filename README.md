@@ -50,12 +50,20 @@ This section provides guidelines for setting up the lab environment manually and
 
 ## Scenarios (attack and detect)
 
+This section will provide instructions on how to generate events, build queries, and create Elastic rules to detect malicious activity in the lab environment. These scenarios are categorized based on the [MITRE ATT&CK](https://attack.mitre.org/) framework.
+
 - **Initial Access**
     - Network service
         - Common service attack
             - [Suspicious Configuration Change Sequence on Cisco IOS Device](/resources/attack-detect-scenarios/initial-access/network-service/common-service-attack/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device.md)
 
 ---
+
+## n8n workflows
+
+This section will provide instructions on how to create n8n workflows based on the Elastic rules above, adding automation, enrichment, AI analysis, case management, report generation, integration with other solutions, and much more.
+
+* [Suspicious Configuration Change Sequence on Cisco IOS Device](/resources/n8n-workflows/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/n8n-Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device.md)
 
 ## Disclaimer
 

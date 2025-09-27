@@ -126,3 +126,31 @@ sudo docker compose -f /opt/n8n-compose/docker-compose.yml up -d
 ```
 
 Further configuration will be done from Windows VM.
+
+In future n8n workflows we will generate PDF reports. To prepare for this, in the initial setup stage we need to install [gotenberg](https://gotenberg.dev/).
+
+Create and enter a new directory:
+
+```bash
+mkdir ~/gotenberg && cd ~/gotenberg
+```
+
+Create a Docker Compose file:
+
+```bash
+tee "./docker-compose.yml" > /dev/null <<'EOF'
+services:
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: gotenberg
+    ports:
+      - "3000:3000"
+    restart: always
+EOF
+```
+
+Start the Gotenberg container:
+
+```bash
+docker compose up -d
+```

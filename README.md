@@ -52,7 +52,8 @@ This section provides guidelines for setting up the lab environment manually and
 
 - **Initial Access**
     - Network service
-        - [Common service attack](/resources/docs/scenarios/attack-detect/initial-access/network-service/common-service-attack/common-service-attack.md)
+        - Common service attack
+            - [Suspicious Configuration Change Sequence on Cisco IOS Device](/resources/attack-detect-scenarios/initial-access/network-service/common-service-attack/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device.md)
 
 ---
 

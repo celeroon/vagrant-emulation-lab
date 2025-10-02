@@ -8,6 +8,7 @@
 
 # Test directories
 test/
+vms/test
 
 # =============================================================================
 # PYTHON
@@ -73,3 +74,5 @@ insecure_private_key
 # Windows installers
 *.msi
 *.exe
+
+*.iso

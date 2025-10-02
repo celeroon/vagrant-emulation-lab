@@ -1,0 +1,555 @@
+{
+  "name": "Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -16
+      ],
+      "id": "d6779a2f-103b-4c76-b2bb-66b5592b0cb7",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "indexId": ".alerts-security.alerts-default",
+        "returnAll": true,
+        "options": {
+          "query": "{\n  \"query\": {\n    \"bool\": {\n      \"must\": [\n        { \"term\": { \"kibana.alert.workflow_status\": \"open\" } },\n        {\n          \"range\": {\n            \"@timestamp\": {\n              \"gte\": \"now-1d\",\n              \"lte\": \"now\"\n            }\n          }\n        }\n      ]\n    }\n  },\n  \"sort\": [\n    { \"@timestamp\": { \"order\": \"desc\" } }\n  ]\n}"
+        }
+      },
+      "type": "n8n-nodes-base.elasticsearch",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -16
+      ],
+      "id": "15a2fb51-45bd-4008-b8a6-37ca13d35c51",
+      "name": "ELK - Get Security Alerts (FULL)",
+      "credentials": {
+        "elasticsearchApi": {
+          "id": "HH6KoGNTkC965DJr",
+          "name": "elk-1-creds"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6859f802-c6f9-4829-977a-db2a2236f3af",
+              "name": "kibana.agent.origical_time",
+              "value": "={{ $json['kibana.alert.original_time'] }}",
+              "type": "string"
+            },
+            {
+              "id": "135c8a41-0bed-4851-90df-0ae674e67042",
+              "name": "kibana.alert.rule.name",
+              "value": "={{ $json['kibana.alert.rule.name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "b0198ff3-6289-49c0-adfe-c7513c1a81c5",
+              "name": "kibana.alert.rule.severity",
+              "value": "={{ $json['kibana.alert.rule.severity'] }}",
+              "type": "string"
+            },
+            {
+              "id": "1dfd0ba2-b98a-4a4f-82fb-cf0d21d57d11",
+              "name": "source.ip",
+              "value": "={{$json[\"source.ip\"] || \"\"}}",
+              "type": "string"
+            },
+            {
+              "id": "813c4bed-f8de-4de8-94c3-be79184a4675",
+              "name": "source.user.name",
+              "value": "={{$json.source?.user?.name || \"\"}}",
+              "type": "string"
+            },
+            {
+              "id": "f0e5301f-1cff-4b66-a434-540c25ab940c",
+              "name": "event.code",
+              "value": "={{ $json['event.code'] }}",
+              "type": "string"
+            },
+            {
+              "id": "524a72c0-89a1-4b17-bfa3-ab8f8e54420c",
+              "name": "message",
+              "value": "={{ $json['message'] }}",
+              "type": "string"
+            },
+            {
+              "id": "5799947e-ce01-4b37-8804-9c43c5b39775",
+              "name": "kibana.alert.uuid",
+              "value": "={{ $json['kibana.alert.uuid'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        608,
+        -16
+      ],
+      "id": "57b6cf99-742f-463e-8a0a-d0db5d552007",
+      "name": "ELK - Extract Interesting Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "02f08dc8-bade-4b9c-829f-e3aacfea9d77",
+              "leftValue": "={{ $json.source.ip }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        -16
+      ],
+      "id": "bfd5142a-577a-4186-ba4d-9ae3a8283943",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutHttpRequest": "",
+        "httpVariantWarning": "",
+        "curlImport": "",
+        "method": "GET",
+        "": "",
+        "url": "=https://www.virustotal.com/api/v3/ip_addresses/{{ $json.source.ip }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "virusTotalApi",
+        "provideSslCertificates": false,
+        "sendQuery": false,
+        "sendHeaders": false,
+        "sendBody": false,
+        "options": {},
+        "infoMessage": ""
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1056,
+        -16
+      ],
+      "id": "d58fe1c3-43fa-46d3-b410-aabeb53f19fe",
+      "name": "VirusTotal",
+      "extendsCredential": "virusTotalApi",
+      "credentials": {
+        "virusTotalApi": {
+          "id": "KoltlDWmaKNlcQs2",
+          "name": "VirusTotal creds"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3b5c34a7-bc50-47b4-8177-29a97c7f0e3e",
+              "name": "last_analysis_stats",
+              "value": "={{ $('VirusTotal').first().json.data.attributes.last_analysis_stats }}",
+              "type": "object"
+            },
+            {
+              "id": "533af38b-d741-44da-9b5a-10851185ba6e",
+              "name": "total_votes",
+              "value": "={{ $('VirusTotal').first().json.data.attributes.total_votes }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1264,
+        -16
+      ],
+      "id": "92d682e7-76ec-49ef-9523-8dfed90cca14",
+      "name": "VT-GET-STATS",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1504,
+        -272
+      ],
+      "id": "95f28347-eb8c-453f-8bad-4a4a6ecd8a0a",
+      "name": "MERGE-VT-STATS-TO-IP"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1808,
+        -384
+      ],
+      "id": "8d488183-a339-4fe7-b79b-40c6f190ea0c",
+      "name": "Merge-ALL"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: items[] from \"Merge-ALL\"\n// Output: one item: { html: \"<!doctype html>...\" }\n\nfunction esc(s) {\n  return String(s ?? '')\n    .replace(/&/g,'&amp;').replace(/</g,'&lt;')\n    .replace(/>/g,'&gt;').replace(/\"/g,'&quot;')\n    .replace(/'/g,'&#39;');\n}\n\nconst data = items.map(i => i.json);\n\n// sort oldest → newest\ndata.sort(\n  (a, b) => new Date(a?.kibana?.agent?.origical_time || 0) - new Date(b?.kibana?.agent?.origical_time || 0)\n);\n\nconst generatedAt = new Date().toISOString();\nconst count = data.length;\nconst ruleName = data[0]?.kibana?.alert?.rule?.name || \"—\";\n\nlet rows = '';\n\nfor (const e of data) {\n  const t    = e?.kibana?.agent?.origical_time || '';\n  const ip   = (e?.source?.ip || '').trim();\n  const user = (e?.source?.user?.name || '').trim();\n  const code = e?.event?.code || '';\n  const msg  = e?.message || '';\n\n  const stats = e?.last_analysis_stats;\n  const votes = e?.total_votes;\n\n  // Build meta rows, conditionally adding ip/user\n  const metaLines = [\n    `<div class=\"k\"><span class=\"label\">time</span></div><div class=\"v\">${esc(t)}</div>`,\n    `<div class=\"k\"><span class=\"label\">event.code</span></div><div class=\"v\">${esc(code)}</div>`\n  ];\n  if (ip)   metaLines.push(`<div class=\"k\"><span class=\"label\">source.ip</span></div><div class=\"v\">${esc(ip)}</div>`);\n  if (user) metaLines.push(`<div class=\"k\"><span class=\"label\">user.name</span></div><div class=\"v\">${esc(user)}</div>`);\n\n  // VirusTotal rows in the same key/value spacing\n  let vtBlock = '';\n  if (stats || votes) {\n    const vtLines = [];\n    if (stats) {\n      vtLines.push(\n        `<div class=\"k head\">VirusTotal · last_analysis_stats</div><div></div>`,\n        `<div class=\"k\"><span>malicious</span></div><div class=\"v\">${stats.malicious ?? 0}</div>`,\n        `<div class=\"k\"><span>suspicious</span></div><div class=\"v\">${stats.suspicious ?? 0}</div>`,\n        `<div class=\"k\"><span>undetected</span></div><div class=\"v\">${stats.undetected ?? 0}</div>`,\n        `<div class=\"k\"><span>harmless</span></div><div class=\"v\">${stats.harmless ?? 0}</div>`,\n        `<div class=\"k\"><span>timeout</span></div><div class=\"v\">${stats.timeout ?? 0}</div>`\n      );\n    }\n    if (votes) {\n      vtLines.push(\n        `<div class=\"k head\">VirusTotal · total_votes</div><div></div>`,\n        `<div class=\"k\"><span>harmless</span></div><div class=\"v\">${votes.harmless ?? 0}</div>`,\n        `<div class=\"k\"><span>malicious</span></div><div class=\"v\">${votes.malicious ?? 0}</div>`\n      );\n    }\n    vtBlock = `\n      <div class=\"vt\">\n        <div class=\"kvgrid\">\n          ${vtLines.join('\\n')}\n        </div>\n      </div>`;\n  }\n\n  rows += `\n  <section class=\"card\">\n    <div class=\"meta\">\n      ${metaLines.join('\\n')}\n    </div>\n\n    <div class=\"message\"><pre>${esc(msg)}</pre></div>\n\n    ${vtBlock}\n  </section>`;\n}\n\nconst html = `<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>${esc(ruleName)}</title>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>\n  /* A4-friendly */\n  @page { size: A4; margin: 18mm; }\n  html, body { height: 100%; }\n  body {\n    font: 12px/1.5 -apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Inter,Arial,sans-serif;\n    color:#111; margin:0;\n  }\n\n  .title { margin: 0 0 10px 0; }\n  .title h1 { font-size: 20px; margin: 0 0 2px; font-weight: 800; }\n  .small { font-size: 10px; color:#666; }\n\n  .card {\n    break-inside: avoid;\n    border: 1px solid #ddd;\n    border-radius: 8px;\n    padding: 10px 12px;\n    margin: 10px 0 14px;\n    box-shadow: 0 1px 0 rgba(0,0,0,.03);\n  }\n\n  /* consistent 2-col label/value grid */\n  .meta, .kvgrid {\n    display: grid;\n    grid-template-columns: 140px 1fr;\n    column-gap: 12px;\n    row-gap: 6px;\n    align-items: start;\n  }\n  .label { font-weight: 700; color:#333; }\n  .k.head { font-weight: 700; color:#333; padding-top: 6px; }\n  .message { margin-top: 8px; }\n  .message pre {\n    background:#fbfbfb; border:1px solid #eee; border-radius:6px;\n    padding:8px; white-space:pre-wrap; word-break:break-word; margin:0;\n    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace;\n    font-size: 11px;\n  }\n\n  /* remove fixed footer to avoid overlap on page breaks */\n</style>\n</head>\n<body>\n  <div class=\"title\">\n    <h1>${esc(ruleName)}</h1>\n    <div class=\"small\">Items: ${count} • Generated: ${esc(generatedAt)}</div>\n  </div>\n\n  ${rows}\n</body>\n</html>`;\n\nreturn [{ json: { html } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        -384
+      ],
+      "id": "bcb059c2-9e13-4de5-a99e-83671634787e",
+      "name": "Build HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(it => {\n  const html = it.json.html || '<!doctype html><html><body>No HTML</body></html>';\n\n  return {\n    json: {\n      ...it.json,\n    },\n    binary: {\n      report_html: {\n        data: Buffer.from(html).toString('base64'),\n        mimeType: 'text/html',\n        fileExtension: 'html',\n        fileName: 'index.html',\n      }\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2224,
+        -384
+      ],
+      "id": "b02c78ce-c4cf-464e-8bbb-834d3a91395e",
+      "name": "Create HTML file"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://172.16.10.7:3000/forms/chromium/convert/html",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "files",
+              "inputDataFieldName": "report_html"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2432,
+        -384
+      ],
+      "id": "7ba91dd2-223c-4a93-a427-b16ec31db42c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutHttpRequest": "",
+        "httpVariantWarning": "",
+        "curlImport": "",
+        "method": "POST",
+        "": "",
+        "url": "https://172.16.10.6/alerts/add",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "dfirIrisApi",
+        "provideSslCertificates": false,
+        "sendQuery": false,
+        "sendHeaders": false,
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"alert_title\": $json.title || \"Suspicious Configuration Change Sequence on Cisco IOS Device\",\n  \"alert_source\": \"Elastic\",\n  \"alert_description\": $json.summary,         // <-- your readable text here\n  \"alert_note\": \"Auto-import from n8n\",\n  \"alert_status_id\": 1,                        // use valid IDs from your IRIS\n  \"alert_severity_id\": 3,\n  \"alert_customer_id\": 1,\n  \"alert_classification_id\": 6,\n  \"alert_source_content\": { \"raw\": $json.raw } // keep full array too\n}\n}}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        },
+        "infoMessage": ""
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2224,
+        -160
+      ],
+      "id": "5e68b5f5-52d4-4053-8a0f-676b177bc92b",
+      "name": "DFIR-IRIS-ADD-ALERT",
+      "extendsCredential": "dfirIrisApi",
+      "credentials": {
+        "dfirIrisApi": {
+          "id": "hP5RQqgKqggsZOEb",
+          "name": "DFIR-IRIS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect from the node named \"Merge-ALL\"\nconst src = $items(\"Merge-ALL\");\nif (!src.length) throw new Error(\"Merge-ALL produced no items\");\n\nlet arr;\nif (src.length === 1) {\n  const j = src[0].json;\n  if (Array.isArray(j)) arr = j;\n  else if (typeof j === \"string\") arr = JSON.parse(j);\n  else arr = [j];\n} else {\n  arr = src.map(i => i.json);\n}\n\n// Build simple text lines (ASCII dash instead of bullet)\nconst lines = arr.map(o => {\n  const t = o?.kibana?.agent?.origical_time || \"\";\n  const code = o?.event?.code || \"\";\n  const user = o?.source?.user?.name || \"\";\n  const ip = o?.source?.ip || \"\";\n  const msg = o?.message || \"\";\n  const who = [user && `user:${user}`, ip && `ip:${ip}`].filter(Boolean).join(\" \");\n  return `- ${t}  ${code}${who ? ` [${who}]` : \"\"} - ${msg}`;\n});\n\n// Title from rule name if present\nconst title = arr?.[0]?.kibana?.alert?.rule?.name || \"Network device config change\";\nconst summary = `Summary (${arr.length} events) – ${title}\\n` + lines.join(\"\\n\");\n\n// Output ONE item\nreturn [{ json: { summary, raw: arr, title } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        -160
+      ],
+      "id": "99df0d7b-b7a6-4039-9776-be6db298f05f",
+      "name": "Build-Summary"
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutHttpRequest": "",
+        "httpVariantWarning": "",
+        "curlImport": "",
+        "method": "POST",
+        "": "",
+        "url": "=https://172.16.10.6/alerts/escalate/{{ $json.data.alert_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "dfirIrisApi",
+        "provideSslCertificates": false,
+        "sendQuery": false,
+        "sendHeaders": false,
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  \"case_title\": $json.data.alert_title,\n  \"case_tags\": \"cisco,ios,config-change,ssh\",\n  \"import_as_event\": true,\n  \"note\": \"Auto-escalated from n8n.\",\n  \"iocs_import_list\": [],\n  \"assets_import_list\": []\n}\n}}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        },
+        "infoMessage": ""
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2432,
+        -160
+      ],
+      "id": "fad7d7f1-be90-4d0c-9f61-5d5f1094f0f7",
+      "name": "DFIR-IRIS HTTP Request",
+      "extendsCredential": "dfirIrisApi",
+      "credentials": {
+        "dfirIrisApi": {
+          "id": "hP5RQqgKqggsZOEb",
+          "name": "DFIR-IRIS account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        2144,
+        256
+      ],
+      "id": "da150fc9-62c9-4cca-b390-5513c77466d2",
+      "name": "Execute Command"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "ELK - Get Security Alerts (FULL)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ELK - Get Security Alerts (FULL)": {
+      "main": [
+        [
+          {
+            "node": "ELK - Extract Interesting Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ELK - Extract Interesting Data": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "VirusTotal",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "MERGE-VT-STATS-TO-IP",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge-ALL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VirusTotal": {
+      "main": [
+        [
+          {
+            "node": "VT-GET-STATS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VT-GET-STATS": {
+      "main": [
+        [
+          {
+            "node": "MERGE-VT-STATS-TO-IP",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "MERGE-VT-STATS-TO-IP": {
+      "main": [
+        [
+          {
+            "node": "Merge-ALL",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge-ALL": {
+      "main": [
+        [
+          {
+            "node": "Build HTML",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Build-Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build HTML": {
+      "main": [
+        [
+          {
+            "node": "Create HTML file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create HTML file": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "Build-Summary": {
+      "main": [
+        [
+          {
+            "node": "DFIR-IRIS-ADD-ALERT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DFIR-IRIS-ADD-ALERT": {
+      "main": [
+        [
+          {
+            "node": "DFIR-IRIS HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6489a09c-275e-47ba-bbec-c29f99fa5a3e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2585e239b8d2af12430778a53cc0428c32407b69945abf85ee6a18d7e1d9ada6"
+  },
+  "id": "EmBe0Pprk4BdhqCD",
+  "tags": []
+}

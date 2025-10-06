@@ -39,6 +39,7 @@ This section provides guidelines for setting up the lab environment manually and
 * [Kali Linux](/resources/docs/vm-setup/setup-kali-linux.md)
 * [Email server](/resources/docs/vm-setup/setup-email-server.md)
 * [C2 server](/resources/docs/vm-setup/setup-c2-server.md)
+* [CAPEv2](/resources/docs/vm-setup/setup-capev2.md)
 * [Windows workstation](/resources/docs/vm-setup/setup-windows-workstation.md)
 * [Branch host](/resources/docs/vm-setup/setup-branch-host.md)
 <!-- * [Build NethSecurity firewall Vagrant (libvirt) box](/resources/docs/vagrant-libvirt/build-nethsecurity-firewall-vagrant-libvirt-box.md) -->

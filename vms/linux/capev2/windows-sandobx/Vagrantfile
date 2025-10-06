@@ -1,0 +1,91 @@
+Vagrant.configure("2") do |config|
+  config.vm.box_check_update = false
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.boot_timeout = 1200
+  config.ssh.insert_key = false
+  config.nfs.verify_installed = false
+  config.vm.allow_hosts_modification = true
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.suspend_mode = "managedsave"
+    libvirt.default_prefix = ""
+    libvirt.connect_via_ssh = true
+    libvirt.username = $exec_node_user
+    libvirt.id_ssh_key_file = File.expand_path("~/.vagrant.d/insecure_private_key")
+    libvirt.uri = "qemu+ssh://vagrant@192.168.225.104/system?keyfile=#{File.expand_path("~/.vagrant.d/insecure_private_key")}"  
+    libvirt.proxy_command = "ssh {host} -l {username} -i {id_ssh_key_file} nc %h %p"
+    libvirt.management_network_keep = true
+    libvirt.management_network_name = "default"
+    # libvirt.management_network_address = ""
+    # libvirt.graphics_autoport = "yes"
+    libvirt.graphics_ip = "192.168.225.104"
+    libvirt.channel :type => 'unix', :target_type => 'virtio', :target_name => 'org.qemu.guest_agent.0'
+    libvirt.channel :type => 'spicevmc', :target_type => 'virtio', :target_name => 'com.redhat.spice.0', :disabled => true
+  end
+
+  # config.vm.network :forwarded_port,
+  #   guest: 5986, host: 5986, id: "winrm", auto_correct: true
+
+  config.vm.define "windows10-1" do |node|
+    node.vm.guest = :windows
+    node.vm.box = "peru/windows-10-enterprise-x64-eval"
+
+    node.vm.provider "libvirt" do |domain|
+      domain.management_network_mac = "52:54:00:aa:bb:cc"
+      domain.cpus = 6
+      domain.memory = 16384
+      domain.graphics_type = "vnc"
+      domain.graphics_port = 5999
+      domain.video_type = "virtio"
+      domain.cpu_mode = "host-passthrough"
+      domain.machine_type = "q35"
+
+      # Anti-detection flags
+      domain.cpu_feature name: "hypervisor", policy: "disable"
+      domain.kvm_hidden = true
+      domain.hyperv_feature name: 'relaxed',   state: 'on'
+      domain.hyperv_feature name: 'vapic',     state: 'on'
+      domain.hyperv_feature name: 'spinlocks', state: 'on', retries: '8191'
+
+      # SMBIOS spoofing
+      domain.qemuargs value: "-smbios"
+      domain.qemuargs value: "type=0,version=UX305UA.201"
+      domain.qemuargs value: "-smbios"
+      domain.qemuargs value: "type=1,manufacturer=ASUS,product=UX305UA,version=2021.1"
+      domain.qemuargs value: "-smbios"
+      domain.qemuargs value: "type=2,manufacturer=Intel,version=2021.5,product=Intel i9-12900K"
+      domain.qemuargs value: "-smbios"
+      domain.qemuargs value: "type=3,manufacturer=XBZJ"
+      domain.qemuargs value: "-smbios"
+      domain.qemuargs value: "type=17,manufacturer=KINGSTON,loc_pfx=DDR5,speed=4800,serial=000000,part=0000"
+      domain.qemuargs value: "-smbios"
+      domain.qemuargs value: "type=4,manufacturer=Intel,max-speed=4800,current-speed=4800"
+
+      # CPU string + Hyper-V vendor ID spoof
+      domain.qemuargs value: "-cpu"
+      domain.qemuargs value: "host,family=6,model=158,stepping=2,model_id=Intel(R) Core(TM) i9-12900K CPU @ 2.60GHz,hypervisor=off,hv-vendor-id=GenuineIntel"
+
+      # domain.qemuargs value: "-machine"
+      # domain.qemuargs value: "q35,kernel_irqchip=on"
+    end
+
+    # === Port forwards on capev2 (libvirt host) ===
+    # WinRM over SSL
+    node.vm.network :forwarded_port,
+      guest: 5986, host: 5986, id: "winrm-ssl",
+      host_ip: "192.168.225.104", protocol: "tcp", auto_correct: true
+
+    # RDP
+    node.vm.network :forwarded_port,
+      guest: 3389, host: 3389, id: "rdp",
+      host_ip: "192.168.225.104", protocol: "tcp", auto_correct: true
+    
+    node.winrm.host = "192.168.225.104"
+    node.vm.communicator = "winrm"
+    node.winrm.username = "vagrant"
+    node.winrm.password = "vagrant"
+    node.winrm.transport = :ssl
+    node.winrm.ssl_peer_verification = false
+    node.winrm.port = 5986
+  end
+
+end

@@ -11,7 +11,7 @@ You can find the official recommendations in the repository:
 I followed the instructions described in Rizqi Setyo Kusprihantanto’s blog posts:
 
 * [https://osintteam.blog/building-capev2-automated-malware-analysis-sandbox-part-1-da2a6ff69cdb](https://osintteam.blog/building-capev2-automated-malware-analysis-sandbox-part-1-da2a6ff69cdb)
-* [https://infosecwriteups.com/building-capev2-automated-malware-analysis-sandbox-part-2-0c47e4b5cbcd](https://infosecwriteups.com/building-capev2-automated-malware-analysis-sandbox-part-2-0c47e4b5cbcd)
+* [https://infosecwriteups.com/building-capev2-automated-malware-analysis-sandbox-part-2-0c47e4b5cbcd](https://infosecwriteupsudo chown cape:cape /opt/CAPEv2/conf/cuckoo.confs.com/building-capev2-automated-malware-analysis-sandbox-part-2-0c47e4b5cbcd)
 * [https://osintteam.blog/building-capev2-automated-malware-analysis-sandbox-part-3-d5535a0ab6f6](https://osintteam.blog/building-capev2-automated-malware-analysis-sandbox-part-3-d5535a0ab6f6)
 
 > [!IMPORTANT]  
@@ -287,6 +287,359 @@ Based on the information provided on original [blog post](https://infosecwriteup
 * [ionuttbara](https://github.com/ionuttbara/windows-defender-remover)
 * [es3n1n](https://github.com/es3n1n/no-defender)
 
-I will test first one, the instructions are provided in the repo, where packed script is available on project releases, you can just run `.exe.`.
+On provided instructions you need to disable manually `Real-time protection` and `Tamper Protection`. I will use first repository where the packaged script is available in the project releases. You can simply run the `.exe` by following instructions and **restart** VM.
 
+Following the guideline from blog post you need to disable window Update. There are several tools provided:
 
+* [win10_disabler.ps1 from CAPEv2 repository](https://github.com/kevoreilly/CAPEv2/blob/master/installer/win10_disabler.ps1)
+* [window-update-disabler](https://github.com/tsgrgo/window-update-disabler)
+
+Add a bypass to execute PowerShell scripts:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+Then unblock it
+
+```powershell
+Unblock-File .\win10_disabler.ps1
+```
+
+**Reboot VM**
+
+Author also show additional tool [WereDev/Wu10Man](https://github.com/WereDev/Wu10Man) where describe what you need to disable inside app:
+
+* All Schedules Tasks 
+* All window Services
+
+**Reboot VM**
+
+And also shown [Winaero Tweaker](https://winaero.com/winaero-tweaker/) tool to disable additional features as:
+
+* Ads and Unwanted Apps (check all except `stop unwanted apps that window installs automatically`)
+* Disable Downloads Blocking (uncheck)
+* Disable Driver Updates (check)
+* Disable MRT From Installing (check)
+* Disable SmartScreen (check all)
+* Disable window Update (check)
+* Disable window Defender (check)
+* Protection Against Unwanted Software (uncheck)
+* Auto-update Store apps (check)
+* Disable Cortana (check)
+* Disable Telemetry (check)
+
+**Reboot VM**
+
+another tools that must be disabled are Terminal Server, RDP-TCP, LSA, and Security System. Using `regedit.exe` you need to edit:
+
+* `Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server` -> fDenyTSConnections -> (hex) 0
+* `Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations` -> UserAuthentication -> (hex) 0
+* `Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa` -> LimitBlankPasswordUse -> (hex) 0
+
+<!-- Microsoft Office -->
+
+Tweaking the Internet Options
+
+Following the [blog post](https://infosecwriteups.com/building-capev2-automated-malware-analysis-sandbox-part-2-0c47e4b5cbcd) you need navigate to the `Control Panel` -> `Internet Options` and in the `Security` for each Internet, Local internet, Trusted sites, and Restricted sites zone - change properties as below:
+
+<div align="center">
+    <img alt="Internet properties" src="/resources/images/capev2/internet-properties.png" width="100%">
+</div>
+
+**.NET Framework**
+- All enabled
+
+**.NET Framework-reliant components**
+- Permission for components with manifest - Disabled
+- Other options are enabled
+
+**ActiveX controls and plug-ins**
+- Allow ActiveX Filtering - Disabled 
+- Automatic prompting for ActiveX controls - Disabled
+- Only allow approved domains to use ActiveX without prompt - Disabled
+- Run antimalware software on Active controls - Disabled
+- Other options are enabled
+
+**Downloads**
+- All enabled
+
+**Enable .NET Framework Setup**
+- Enabled
+
+**Miscellaneous**
+- Use Pop-up Blocker - Disabled
+- Use window Defender SmartScreen - Disabled
+- Other options are enabled
+
+**Scripting**
+- Enable XSS filter - Disabled
+- Other options are enabled
+
+**User Authentication**
+- Logon - Anonymous logon
+
+Next, navigate to the `Control Panel -> Internet Options -> Privacy` andu uncheck `Turn on Pop-up Blocker`. In the same window, above Pop-up Blocker sections you will see `Settings` click the `Advanced` and select `Accept` for `First-party` and `Third-party` Cookies.
+
+At the top of the same window go to `Advanced` and scroll to the `Security` section and enable first 3 options:
+
+- Allow active content from CDs...
+- Allow active content to run ...
+- Allow software to run ...
+
+Install Python 3.10.6 (32-bit)
+
+> [!IMPORTANT]  
+> Make sure to select **Add Python 3.10. to PATH**
+
+```powershell
+wget https://www.python.org/ftp/python/3.10.6/python-3.10.6.exe -o python-3.10.6.exe
+```
+
+Install Pip and Pillow:
+
+```powershell
+python -m pip install --upgrade pip
+```
+
+```powershell
+python -m pip install Pillow==9.5.0
+```
+
+Download the CAPEv2 agent
+
+```powershell
+wget https://raw.githubusercontent.com/kevoreilly/CAPEv2/master/agent/agent.py -o pizza.pyw
+```
+
+Install the agent by creating Task Scheduler described in official [guide](https://capev2.readthedocs.io/en/latest/installation/guest/agent.html)
+
+You can change IP address configuration to static, but it can be DHCP also, because we have IP reservation on Ubuntu. Before moving next you need relogin or reboot window VM.
+
+To test connectivity to window VM, go to the Ubuntu VM and run curl command to test connectivity to agent
+
+```bash
+curl 192.168.122.250:8000
+```
+
+You will get this message
+
+```
+{"message": "CAPE Agent!", "version": "0.20", "features": ["execpy", "execute", "pinning", "logs", "largefile", "unicodepath", "mutex", "browser_extension"], "is_user_admin": true}
+```
+
+To enable Multicast Name Resolution and Restrict Internet Communication you need to use `gpedit.msc` and enable them, navigate to:
+
+* `Computer Configuration -> Administrative Template -> Network -> DNS Client -> Turn off multicast name resolution` - set `Enable`
+* `Computer Configuration -> Administrative Template -> System -> Internet Communication Management -> Restrict Internet communication` - set Enable
+
+Set ExecutionPolicy in the Unrestricted condition
+
+```powershell
+Set-ExecutionPolicy Unrestricted
+```
+
+If error appears that will told that already changes applied, I found this as a solution to execute
+sudo chown cape:cape /opt/CAPEv2/conf/cuckoo.conf
+
+Enter the Sysmon downloaded directory and install Sysmon
+
+```powershell
+.\Sysmon64.exe -i .\sysmonconfig.xml -accepteula
+```
+
+You can verify that Sysmon is installed and running using command `Get-Service -Name Sysmon*` and `sysmon64.exe -c` in powershell to see that sysmon configuration is applied.
+
+At the end of setup window VM you can install common software to make window more realistic. After all make sure to close all program window. On a main host by using the Cockpit or Virtual Machine Manager navigate to the CAPEv2 (Ubuntu) VM and inside this VM open Virtual Machine Manager to create a snapshot.
+
+> [!IMPORTANT]  
+> window VM sandbox should be in the running state. From Virtual Machine Manage VM must be unlocked.
+
+`View -> Snapshots -> (green plus) Create New Snapshot -> Enter name -> Finish`
+
+<div align="center">
+    <img alt="window sandbox snapshot" src="/resources/images/capev2/window-sandbox-snapshot.png" width="100%">
+</div>
+
+Create custom partitions to speed up memory analysis. This feature is optional in CAPEv2. New partition requires the allocation of storage size depends on the free space in the system.
+
+```bash
+sudo su
+```
+
+```bash
+mkdir /mnt/tmpfs
+```
+
+```bash
+mount -t tmpfs -o size=20g ramfs /mnt/tmpfs
+```
+
+```bash
+chown cape:cape /mnt/tmpfs
+```
+
+```bash
+nano /etc/fstab
+```
+
+Add a new entry at the end for the tmpfs mount
+
+```bash
+ramfs   /mnt/tmpfs   tmpfs   size=20g   0   0
+```
+
+Save and exit. Run the following to check that the syntax is correct and mount it
+
+```bash
+sudo mount -a
+```
+
+Verify it is mounted
+
+```bash
+df -h | grep /mnt/tmpfs
+```
+
+```bash
+crontab -e
+```
+
+Just add at the end
+
+```bash
+@reboot chown cape:cape /mnt/tmpfs -R
+```
+
+Now we need edit some parameters in the CAPEv2 configuration files and run the service. 
+
+**auxiliary.conf**
+
+```bash
+sudo sed -i \
+  -e 's/^amsi = no/amsi = yes/' \
+  -e 's/^curtain = no/curtain = yes/' \
+  -e 's/^evtx = no/evtx = yes/' \
+  -e 's/^human_linux = no/human_linux = yes/' \
+  -e 's/^procmon = no/procmon = yes/' \
+  -e 's/^recentfiles = no/recentfiles = yes/' \
+  -e 's/^sysmon_windows = no/sysmon_windows = yes/' \
+  -e 's/^usage = no/usage = yes/' \
+  -e 's/^file_pickup = no/file_pickup = yes/' \
+  -e 's/^permissions = no/permissions = yes/' \
+  -e 's/^pre_script = no/pre_script = yes/' \
+  -e 's/^during_script = no/during_script = yes/' \
+  -e 's/^browsermonitor = no/browsermonitor = yes/' \
+  /opt/CAPEv2/conf/auxiliary.conf
+```
+
+Then just make sure the file is still owned by cape:cape
+
+```bash
+sudo chown cape:cape /opt/CAPEv2/conf/auxiliary.conf
+```
+
+**cuckoo.conf**
+
+```bash
+sudo sed -i \
+  -e 's/^machinery_screenshots = off/machinery_screenshots = on/' \
+  -e 's/^memory_dump = off/memory_dump = on/' \
+  -e 's/^reschedule = off/reschedule = on/' \
+  -e 's/^freespace = 50000/freespace = 4096/' \
+  -e 's/^freespace_processing = 15000/freespace_processing = 0/' \
+  -e 's/^ip = 192\.168\.1\.1/ip = 0.0.0.0/' \
+  -e 's/^store_csvs = off/store_csvs = on/' \
+  -e 's/^upload_max_size = 100000000/upload_max_size = 1000000000/' \
+  -e 's/^analysis_size_limit = 200000000/analysis_size_limit = 1000000000/' \
+  -e 's/^timeout = .*/timeout = 150/' \
+  -e 's/^default = 200/default = 300/' \
+  -e 's/^critical = 60/critical = 300/' \
+  -e 's/^enabled = off/enabled = on/' \
+  -e 's/^enabled = no/enabled = yes/' \
+  -e 's/^mongo = no/mongo = yes/' \
+  -e 's/^unused_files_in_mongodb = no/unused_files_in_mongodb = yes/' \
+  /opt/CAPEv2/conf/cuckoo.conf
+```
+
+And then fix ownership again so the cape user can still use it:
+
+```bash
+sudo chown cape:cape /opt/CAPEv2/conf/cuckoo.conf
+```
+
+**externalservices.conf**
+
+This configuration file contains external integrations with `MISP` and `whoisxml` and are omitted for now.
+
+**kvm.conf**
+
+```bash
+sudo sed -i \
+  -e 's/^machines = cuckoo1/machines = windows10-1/' \
+  -e 's/^\[cape1\]/[windows10-1]/' \
+  -e 's/^label = cape1/label = windows10-1/' \
+  -e 's/^platform = .*/platform = window/' \
+  -e 's/^ip = 192\.168\.122\.105/ip = 192.168.122.250/' \
+  -e 's/^arch = x86/arch = x64/' \
+  -e 's/^# tags = winxp,acrobat_reader_6/tags = 22H2/' \
+  -e 's/^# snapshot = Snapshot1/# snapshot = snapshot1/' \
+  -e 's/^# resultserver_ip = 192\.168\.122\.101/resultserver_ip = 192.168.122.1/' \
+  -e 's/^# reserved = no/reserved = no/' \
+  /opt/CAPEv2/conf/kvm.conf
+```
+
+Keep ownership correct:
+
+```bash
+sudo chown cape:cape /opt/CAPEv2/conf/kvm.conf
+```
+
+**mitmdump.conf**
+
+```bash
+sudo sed -i 's/^host = 127\.0\.0\.1/host = 192.168.122.1/' /opt/CAPEv2/conf/mitmdump.conf
+```
+
+```bash
+sudo chown cape:cape /opt/CAPEv2/conf/mitmdump.conf
+```
+
+**reporting.conf**
+
+Optionally you can enable html and pdf reporting summary
+
+**routing.conf**
+
+```bash
+sudo sed -i \
+  -e 's/^enable_pcap = no/enable_pcap = yes/' \
+  -e 's/^route = none/route = internet/' \
+  -e 's/^internet = none/internet = virbr0/' \
+  /opt/CAPEv2/conf/routing.conf
+```
+
+```bash
+sudo chown cape:cape /opt/CAPEv2/conf/routing.conf
+```
+
+Restart CAPEv2 services
+
+```bash
+sudo systemctl restart cape.service
+sudo systemctl restart cape-processor.service
+sudo systemctl restart cape-rooter.service
+sudo systemctl restart cape-web.service
+sudo systemctl restart suricata.service
+```
+
+You can get error in the logs that snapshot cannot run due to permissions. For now I found fast fix of the issue, but for lab only that help me:
+
+```bash
+sudo chmod a+r /var/lib/libvirt/images/*
+sudo aa-complain /etc/apparmor.d/usr.sbin.libvirtd 2>/dev/null || true
+sudo aa-complain /etc/apparmor.d/libvirt/* 2>/dev/null || true
+sudo systemctl reload apparmor
+```
+
+CAPEv2 will be available on management or lab IP address on port 8000 using http.

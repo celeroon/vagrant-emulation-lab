@@ -1,0 +1,61 @@
+{
+    "id": "1317273d-03e8-4d1e-a054-e62bd7c0e2ad",
+    "name": "Suspicious Gateway Network Scan",
+    "tags": [
+        "DEMO"
+    ],
+    "interval": "1m",
+    "enabled": false,
+    "revision": 0,
+    "description": "Detects likely network scanning activity originating from a gateway/edge host whose IP ends with .254 and using ephemeral source ports (>=1024). Frequent connections from .254 to many internal addresses/ports in a short time window often indicate automated scanning (e.g., nmap running from a guest shell) and may follow initial compromise of a router or gateway.",
+    "risk_score": 47,
+    "severity": "medium",
+    "note": "1. Verify the source IP, time, and destinations contacted.\n2. Check if the traffic shows fast probes to many hosts/ports.\n3. Confirm if the gateway or router ran scanning tools.\n4. If not planned, isolate the device and collect logs/pcap.\n5. Remove any malicious processes or accounts, rotate creds.\n6. Tune thresholds and whitelist known scanners.",
+    "license": "https://github.com/SigmaHQ/sigma/blob/master/LICENSE",
+    "output_index": "",
+    "meta": {},
+    "author": [
+        "celeroon"
+    ],
+    "false_positives": [
+        "Legitimate vulnerability scans or asset discovery"
+    ],
+    "from": "now-61s",
+    "rule_id": "99bcab31-b48b-475f-b694-b9d54b906e33",
+    "max_signals": 100,
+    "risk_score_mapping": [],
+    "severity_mapping": [],
+    "threat": [
+        {
+            "framework": "MITRE ATT&CK",
+            "tactic": {
+                "id": "TA0043",
+                "name": "Reconnaissance",
+                "reference": "https://attack.mitre.org/tactics/TA0043/"
+            },
+            "technique": [
+                {
+                    "id": "T1595",
+                    "name": "Active Scanning",
+                    "reference": "https://attack.mitre.org/techniques/T1595/",
+                    "subtechnique": []
+                }
+            ]
+        }
+    ],
+    "to": "now",
+    "references": [],
+    "version": 1,
+    "exceptions_list": [],
+    "immutable": false,
+    "rule_source": {
+        "type": "internal"
+    },
+    "related_integrations": [],
+    "required_fields": [],
+    "setup": "",
+    "type": "esql",
+    "language": "esql",
+    "query": "FROM logs-* METADATA _id, _version, _index\r\n| WHERE data_stream.dataset == \"netflow.log\"\r\n  AND RIGHT(TO_STRING(source.ip), 4) == \".254\"\r\n  AND source.port >= 1024\r\n| KEEP @timestamp, source.ip, source.port, destination.ip, destination.port, _id, _version, _index\r\n| SORT @timestamp DESC\r\n| LIMIT 1",
+    "actions": []
+}

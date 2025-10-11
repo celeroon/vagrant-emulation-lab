@@ -126,7 +126,7 @@ exit
 Single-IP pool to look like LAN host
 
 ```bash
-ip nat pool IOX_AS_LAN 172.30.10.253 172.30.10.253 netmask 255.255.255.0
+ip nat pool IOX_AS_LAN 172.30.10.254 172.30.10.254 netmask 255.255.255.0
 ```
 
 Route-map for selective NAT into the LAN IP

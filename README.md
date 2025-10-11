@@ -53,6 +53,9 @@ This section provides guidelines for setting up the lab environment manually and
 
 This section will provide instructions on how to generate events, build queries, and create Elastic rules to detect malicious activity in the lab environment. These scenarios are categorized based on the [MITRE ATT&CK](https://attack.mitre.org/) framework.
 
+- **Reconnaissance**
+    - Network Discovery and Port Scanning
+        - [Suspicious Gateway Network Scan](/resources/attack-detect-scenarios/reconnaissance/networkidiscovery-and-port-scanning/Suspicious-Gateway-Network-Scan/Suspicious-Gateway-Network-Scan.md)
 - **Initial Access**
     - Network service
         - Common service attack

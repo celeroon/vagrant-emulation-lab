@@ -59,3 +59,28 @@ Navigate to the Discovery and switch to the **Security alert data view**. You wi
 <div align="center">
     <img alt="Cisco router alert" src="/resources/attack-detect-scenarios/initial-access/network-service/common-service-attack/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/images/cisco-router-alert-1.png" width="100%">
 </div>
+
+In some cases, it can be useful to create rules for monitoring user creation or configuration saving on a router. An example of [CVE-2023-20198](https://nvd.nist.gov/vuln/detail/cve-2023-20198) is shown in the screenshots below.
+
+<div align="center">
+    <img alt="Cisco router logs" src="/resources/attack-detect-scenarios/initial-access/network-service/common-service-attack/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/images/cisco-cve-1.png" width="100%">
+</div>
+
+You can notice that a non-existing user (the *admin* account does not exist on this router) creates a new user.
+
+<div align="center">
+    <img alt="Cisco router logs" src="/resources/attack-detect-scenarios/initial-access/network-service/common-service-attack/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/images/cisco-cve-user-creation.png" width="100%">
+</div>
+
+Comparing this with a normal user connection:
+
+<div align="center">
+    <img alt="Cisco router logs" src="/resources/attack-detect-scenarios/initial-access/network-service/common-service-attack/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/images/cisco-user-creation.png" width="100%">
+</div>
+
+To detect such events, you can create a simple query and build a [rule](/resources/attack-detect-scenarios/initial-access/network-service/common-service-attack/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/rules/Cisco-IOS-Suspicious-Privileged-User-Creation.ndjson)
+
+```
+data_stream.dataset: "cisco_ios.log" AND event.code: "CFGLOG_LOGGEDCMD" AND message: (*username* AND *privi*)
+```
+

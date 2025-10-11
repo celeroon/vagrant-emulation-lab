@@ -1,0 +1,73 @@
+{
+    "id": "9a0a7599-831d-4938-8c94-59ba5d1e4293",
+    "name": "Cisco IOS Suspicious Privileged User Creation",
+    "tags": [
+        "DEMO"
+    ],
+    "interval": "1m",
+    "enabled": false,
+    "revision": 0,
+    "description": "Detects when a privileged user account is created on a Cisco IOS device via CLI commands. This activity may indicate unauthorized access or post-exploitation activity, especially when not performed by an administrator or outside of change-control windows.",
+    "risk_score": 73,
+    "severity": "high",
+    "note": "1. Review the event details to confirm the device and command executed.\n2. Identify the user who initiated the configuration change and their source IP.\n3. Verify if the user creation was part of a planned administrative action.\n4. Check for preceding login events, privilege escalations, or failed access attempts.\n5. If unauthorized, remove the created user account and rotate device credentials.\n6. Review network logs for any lateral movement or configuration exfiltration attempts.\n",
+    "license": "https://github.com/SigmaHQ/sigma/blob/master/LICENSE",
+    "output_index": "",
+    "meta": {},
+    "author": [
+        "celeroon"
+    ],
+    "false_positives": [
+        "Legitimate administrative actions during maintenance or provisioning"
+    ],
+    "from": "now-61s",
+    "rule_id": "708e088b-8469-43d5-bf21-f127899e4362",
+    "max_signals": 100,
+    "risk_score_mapping": [],
+    "severity_mapping": [],
+    "threat": [
+        {
+            "framework": "MITRE ATT&CK",
+            "tactic": {
+                "id": "TA0004",
+                "name": "Privilege Escalation",
+                "reference": "https://attack.mitre.org/tactics/TA0004/"
+            },
+            "technique": [
+                {
+                    "id": "T1078",
+                    "name": "Valid Accounts",
+                    "reference": "https://attack.mitre.org/techniques/T1078/",
+                    "subtechnique": [
+                        {
+                            "id": "T1078.003",
+                            "name": "Local Accounts",
+                            "reference": "https://attack.mitre.org/techniques/T1078/003/"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "to": "now",
+    "references": [
+        "https://nvd.nist.gov/vuln/detail/cve-2023-20198"
+    ],
+    "version": 1,
+    "exceptions_list": [],
+    "immutable": false,
+    "rule_source": {
+        "type": "internal"
+    },
+    "related_integrations": [],
+    "required_fields": [],
+    "setup": "",
+    "type": "query",
+    "language": "lucene",
+    "index": [
+        "logs-*"
+    ],
+    "query": "data_stream.dataset: \"cisco_ios.log\" AND event.code: \"CFGLOG_LOGGEDCMD\" AND message: (*username* AND *privi*)",
+    "filters": [],
+    "actions": []
+}

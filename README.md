@@ -60,6 +60,8 @@ This section will provide instructions on how to generate events, build queries,
     - Network service
         - Common service attack
             - [Suspicious Configuration Change Sequence on Cisco IOS Device](/resources/attack-detect-scenarios/initial-access/network-service/common-service-attack/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device.md)
+    - Remote Admin Tools (Windows)
+        - [Remote connection followed by suspicious process execution](/resources/attack-detect-scenarios/initial-access/remote-admin-tools-windows/remote-connection-followed-by-suspicious-process-execution/Remote-connection-followed-by-suspicious-process-execution.md)
 
 ---
 

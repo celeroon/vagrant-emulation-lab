@@ -1,0 +1,63 @@
+{
+    "id": "8087d6b8-da08-4c51-a479-d96f73c30ed9",
+    "name": "Remote connection followed by suspicious process execution",
+    "tags": [
+        "DEMO"
+    ],
+    "interval": "2m",
+    "enabled": false,
+    "revision": 0,
+    "description": "Detects a potential initial access or remote execution attempt where a host receives an ingress network connection followed by the execution of suspicious command-line utilities such as cmd.exe, powershell.exe, or net.exe.\nThis pattern may indicate a remote compromise or hands-on-keyboard activity, especially when followed by local account creation (4720–4738) and user logon (4624) events.",
+    "risk_score": 73,
+    "severity": "high",
+    "note": "Check the ingress source: source.ip, destination.port — is it external/unexpected?\nInspect the process: process.name, process.command_line, process.parent.name — signs of cmd/powershell usage or encoded commands?\nVerify IAM events: look for 4720/4722/4724/4738 and winlog.event_data.TargetUserName.\nConfirm authentication: 4624 (non-SYSTEM) soon after the processes; check 4634 for session end.\nQuick response: isolate host if unauthorized, disable new account(s), collect logs.",
+    "license": "https://github.com/SigmaHQ/sigma/blob/master/LICENSE",
+    "output_index": "",
+    "meta": {},
+    "author": [
+        "celeroon"
+    ],
+    "false_positives": [
+        "Legitimate administrative sessions over RDP, WinRM, or SSH",
+        "Penetration testing or red-team exercises",
+        "Automation or configuration management tools that create users or run scripts remotely"
+    ],
+    "from": "now-121s",
+    "rule_id": "9785feb8-9d84-4d66-a5a3-c110d107dddb",
+    "max_signals": 100,
+    "risk_score_mapping": [],
+    "severity_mapping": [],
+    "threat": [
+        {
+            "framework": "MITRE ATT&CK",
+            "tactic": {
+                "id": "TA0001",
+                "name": "Initial Access",
+                "reference": "https://attack.mitre.org/tactics/TA0001/"
+            },
+            "technique": [
+                {
+                    "id": "T1133",
+                    "name": "External Remote Services",
+                    "reference": "https://attack.mitre.org/techniques/T1133/",
+                    "subtechnique": []
+                }
+            ]
+        }
+    ],
+    "to": "now",
+    "references": [],
+    "version": 1,
+    "exceptions_list": [],
+    "immutable": false,
+    "rule_source": {
+        "type": "internal"
+    },
+    "related_integrations": [],
+    "required_fields": [],
+    "setup": "",
+    "type": "esql",
+    "language": "esql",
+    "query": "FROM logs-* METADATA _id, _index\r\n| WHERE (\r\n    (event.category == \"network\" AND network.direction == \"ingress\" AND source.ip NOT IN (\"224.0.0.251\",\"192.168.225.1\") AND destination.port != 68)\r\n    OR (event.category == \"process\" AND event.code == \"1\" AND process.name IN (\"cmd.exe\",\"powershell.exe\",\"net.exe\",\"net1.exe\") OR process.parent.name IN (\"cmd.exe\",\"powershell.exe\",\"net.exe\",\"net1.exe\"))\r\n    OR (event.category == \"iam\" AND winlog.task == \"User Account Management\" AND event.code IN (\"4724\",\"4738\",\"4722\",\"4720\"))\r\n    OR (event.category == \"authentication\" AND event.code == \"4624\" AND winlog.task == \"Logon\" AND winlog.event_data.TargetUserName != \"SYSTEM\")\r\n    OR (event.category == \"authentication\" AND event.code == \"4634\" AND winlog.task == \"Logoff\" AND winlog.logon.type != \"Service\")\r\n  )\r\n| KEEP @timestamp, event.category, event.code, event.action,\r\n       source.ip, destination.ip, destination.port,\r\n       process.name, process.command_line, process.parent.name, winlog.task,\r\n       winlog.event_data.SubjectUserName, winlog.event_data.TargetUserName,\r\n       source.ip, destination.ip, host.id,\r\n       _id, _index\r\n| SORT @timestamp ASC",
+    "actions": []
+}

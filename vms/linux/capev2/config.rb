@@ -4,6 +4,8 @@ config.vm.define "capev2-1" do |node|
   node.vm.hostname = "capev2"
   node.vm.provider :libvirt do |domain|
     domain.management_network_mac = "52:54:02:54:01:04" # eth0
+    domain.cpu_mode = "host-passthrough"
+    domain.machine_type = "q35"
     domain.cpus = 8
     domain.memory = 24576
     domain.storage :file, :path => 'capev2-data.qcow2', :size => '300G', :bus => 'virtio', :type => 'qcow2', :discard => 'unmap', :detect_zeroes => 'on'

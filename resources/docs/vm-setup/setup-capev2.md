@@ -1,5 +1,8 @@
 # Setup CAPEv2 node
 
+> [!CAUTION]
+> This guide is not complete due to the lack of reliable deployment instructions. The described setup may not work properly. I will revisit and update this installation process in the future.
+
 In this section, we will create a CAPEv2 instance in the lab. This setup will probably be manual only, as it is difficult to configure with automation scripts, especially when disabling all unnecessary services on Windows. The official documentation recommends using Windows 10 21H2, but we will use a Windows 10 box from Vagrant Cloud (22H2). This setup is for lab use only; to run it in production, you need to properly configure the VM, for example, to avoid virtualization detection. The following tools may be useful:
 
 * [https://github.com/a0rtega/pafish](https://github.com/a0rtega/pafish)

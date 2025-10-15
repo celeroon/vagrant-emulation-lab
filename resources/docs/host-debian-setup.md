@@ -294,6 +294,7 @@ vagrant box add --provider libvirt vyos/current
 vagrant box add --provider libvirt aarna/cumulus-vx-5.11.1
 vagrant box add --provider libvirt joaobrlt/ubuntu-desktop-24.04
 vagrant box add --provider libvirt kalilinux/rolling
+vagrant box add --provider libvirt generic/ubuntu2204
 ```
 
 For Windows I recommend boxes from [peru](https://portal.cloud.hashicorp.com/vagrant/discover/peru) but later I will show how to build Windows 11/2025 box. If you want to deploy [CAPEv2](https://github.com/kevoreilly/CAPEv2) sandbox later you need to download windows 10 box:

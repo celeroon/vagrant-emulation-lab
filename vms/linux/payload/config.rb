@@ -11,10 +11,10 @@ config.vm.define "payload-server-1" do |node|
   end
   node.vm.network :private_network,
     libvirt__tunnel_type: "udp",
-    libvirt__tunnel_local_ip: "127.1.14.2",
-    libvirt__tunnel_local_port: "10114",
-    libvirt__tunnel_ip: "127.1.14.1",
-    libvirt__tunnel_port: "10114",
+    libvirt__tunnel_local_ip: "127.1.13.2",
+    libvirt__tunnel_local_port: "10113",
+    libvirt__tunnel_ip: "127.1.13.1",
+    libvirt__tunnel_port: "10113",
     libvirt__iface_name: "eth1",
     auto_config: false
   # node.vm.provision "ansible" do |ansible|

@@ -1,0 +1,67 @@
+{
+    "id": "2d0564f9-0d45-4dbe-b559-4f2cfb393950",
+    "name": "ESQL - Suspicious PowerShell Download and Execute Pattern",
+    "tags": [
+        "DEMO"
+    ],
+    "interval": "1m",
+    "enabled": true,
+    "revision": 1,
+    "description": "Detects suspicious PowerShell download patterns using System.Net.WebClient (DownloadString with IEX or -Command ... DownloadFile) recorded as PowerShell 4103 “Script” events, then correlates—within the same second and user—to a file‐creation from endpoint telemetry. The rule normalizes potential payload names across common extensions (.exe, .dll, .ps1, .bat, .vbs, .js, .jse, .cmd, .msi, .scr, .cpl, .hta, .lnk) and raises when both a matching script pattern and a file creation co-occur, surfacing the command line and created file path.",
+    "risk_score": 73,
+    "severity": "high",
+    "note": "1. Check `out.process.command.line` — copy the exact PowerShell command and extract the URL/domain.\n2. Verify `out.file.path`/`out.file.name` — compute hash and check signer/reputation (VT).\n3. Confirm execution — search for processes or command lines that run the dropped filename on the host.\n4. Pivot by user/host ±10 min for other PS activity, file writes, and network connections to the same URL/IP.\n5. Contain & remediate — isolate host, block URL/IP, kill processes, remove/quarantine file, and check persistence (scheduled tasks, run keys).",
+    "license": "https://github.com/SigmaHQ/sigma/blob/master/LICENSE",
+    "output_index": "",
+    "meta": {},
+    "author": [
+        "celeroon"
+    ],
+    "false_positives": [],
+    "from": "now-1m",
+    "rule_id": "9cf56b73-9bb7-47f7-bc42-1d735bca2c31",
+    "max_signals": 100,
+    "risk_score_mapping": [],
+    "severity_mapping": [],
+    "threat": [
+        {
+            "framework": "MITRE ATT&CK",
+            "tactic": {
+                "id": "TA0002",
+                "name": "Execution",
+                "reference": "https://attack.mitre.org/tactics/TA0002/"
+            },
+            "technique": [
+                {
+                    "id": "T1059",
+                    "name": "Command and Scripting Interpreter",
+                    "reference": "https://attack.mitre.org/techniques/T1059/",
+                    "subtechnique": [
+                        {
+                            "id": "T1059.001",
+                            "name": "PowerShell",
+                            "reference": "https://attack.mitre.org/techniques/T1059/001/"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "to": "now",
+    "references": [
+        "https://github.com/SigmaHQ/sigma/blob/master/rules/windows/process_creation/proc_creation_win_powershell_susp_download_patterns.yml"
+    ],
+    "version": 1,
+    "exceptions_list": [],
+    "immutable": false,
+    "rule_source": {
+        "type": "internal"
+    },
+    "related_integrations": [],
+    "required_fields": [],
+    "setup": "",
+    "type": "esql",
+    "language": "esql",
+    "query": "FROM logs-*\r\n| WHERE\r\n    (\r\n      (\r\n        process.command_line.text RLIKE \".*IEX.*\\\\(New-Object\\\\s+Net\\\\.WebClient\\\\)\\\\.DownloadString.*\" OR\r\n        process.command_line.text RLIKE \".*iex.*\\\\(New-Object\\\\s+Net\\\\.WebClient\\\\)\\\\.DownloadString.*\" OR\r\n        process.command_line.text RLIKE \".*Iex.*\\\\(New-Object\\\\s+Net\\\\.WebClient\\\\)\\\\.DownloadString.*\" OR\r\n        process.command_line.text RLIKE \".*\\\\-command\\\\s*\\\\(New-Object\\\\s+System\\\\.Net\\\\.WebClient\\\\)\\\\.DownloadFile\\\\(.*\" OR\r\n        process.command_line.text RLIKE \".*\\\\-Command\\\\s*\\\\(New-Object\\\\s+System\\\\.Net\\\\.WebClient\\\\)\\\\.DownloadFile\\\\(.*\" OR\r\n        process.command_line.text RLIKE \".*\\\\-COMMAND\\\\s*\\\\(New-Object\\\\s+System\\\\.Net\\\\.WebClient\\\\)\\\\.DownloadFile\\\\(.*\" OR\r\n        process.command_line.text RLIKE \".*\\\\-c\\\\s*\\\\(New-Object\\\\s+System\\\\.Net\\\\.WebClient\\\\)\\\\.DownloadFile\\\\(.*\" OR\r\n        process.command_line.text RLIKE \".*\\\\-C\\\\s*\\\\(New-Object\\\\s+System\\\\.Net\\\\.WebClient\\\\)\\\\.DownloadFile\\\\(.*\"\r\n      )\r\n      AND event.code == \"4103\"\r\n      AND powershell.command.type == \"Script\"\r\n    )\r\n  OR (\r\n      event.category == \"file\" AND event.module == \"endpoint\" AND event.action == \"creation\"\r\n    )\r\n| EVAL ts_sec = DATE_TRUNC(1 second, @timestamp)\r\n\r\n/* ---- extract stems per extension ---- */\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_exe}\\\\.exe%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_dll}\\\\.dll%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_ps1}\\\\.ps1%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_bat}\\\\.bat%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_vbs}\\\\.vbs%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_js}\\\\.js%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_jse}\\\\.jse%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_cmd}\\\\.cmd%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_msi}\\\\.msi%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_scr}\\\\.scr%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_cpl}\\\\.cpl%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_hta}\\\\.hta%{GREEDYDATA}\"\r\n| GROK process.command_line \"%{GREEDYDATA}\\\\\\\\%{DATA:file_stem_lnk}\\\\.lnk%{GREEDYDATA}\"\r\n\r\n/* ---- build candidates (NULL if stem didn't match) ---- */\r\n| EVAL f_exe = CONCAT(file_stem_exe, \".exe\")\r\n| EVAL f_dll = CONCAT(file_stem_dll, \".dll\")\r\n| EVAL f_ps1 = CONCAT(file_stem_ps1, \".ps1\")\r\n| EVAL f_bat = CONCAT(file_stem_bat, \".bat\")\r\n| EVAL f_vbs = CONCAT(file_stem_vbs, \".vbs\")\r\n| EVAL f_js  = CONCAT(file_stem_js,  \".js\")\r\n| EVAL f_jse = CONCAT(file_stem_jse, \".jse\")\r\n| EVAL f_cmd = CONCAT(file_stem_cmd, \".cmd\")\r\n| EVAL f_msi = CONCAT(file_stem_msi, \".msi\")\r\n| EVAL f_scr = CONCAT(file_stem_scr, \".scr\")\r\n| EVAL f_cpl = CONCAT(file_stem_cpl, \".cpl\")\r\n| EVAL f_hta = CONCAT(file_stem_hta, \".hta\")\r\n| EVAL f_lnk = CONCAT(file_stem_lnk, \".lnk\")\r\n\r\n/* ---- single normalization (all keyword args) ---- */\r\n| EVAL file_name_norm = COALESCE(`file.name`, f_exe, f_dll, f_ps1, f_bat, f_vbs, f_js, f_jse, f_cmd, f_msi, f_scr, f_cpl, f_hta, f_lnk)\r\n\r\n/* --- include host.name in grouping --- */\r\n| WHERE file_name_norm IS NOT NULL AND user.name IS NOT NULL\r\n| STATS\r\n    proc_count = COUNT(process.command_line),\r\n    file_count = COUNT(file.path),\r\n    ts_any     = MAX(@timestamp),\r\n    cmd_any    = MAX(process.command_line),\r\n    path_any   = MAX(file.path),\r\n    act_any    = MAX(event.action)\r\n  BY ts_sec, user.name, host.name, file_name_norm\r\n| WHERE proc_count > 0 AND file_count > 0\r\n| RENAME\r\n    ts_any           AS out.timestamp,\r\n    cmd_any          AS out.process.command.line,\r\n    path_any         AS out.file.path,\r\n    act_any          AS out.event.action,\r\n    file_name_norm   AS out.file.name\r\n| KEEP out.timestamp, out.process.command.line, out.file.name, out.file.path, out.event.action, user.name, host.name\r\n| SORT out.timestamp DESC",
+    "actions": []
+}

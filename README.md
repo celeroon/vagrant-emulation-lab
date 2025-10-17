@@ -23,29 +23,43 @@ This section provides guidelines for setting up the lab environment manually and
 * [Build FortiGate Vagrant (libvirt) box](/resources/docs/vagrant-libvirt/build-fortigate-vagrant-libvirt-box.md)
 * [Build Cisco cat8kv Vagrant (libvirt) box](/resources/docs/vagrant-libvirt/build-cisco-cat8kv-vagrant-libvirt-box.md)
 * [Build Windows 11/2025 Vagrant (libvirt) box](/resources/docs/vagrant-libvirt/build-windows-11-2025-libvirt-box.md)
+<!-- * [Build NethSecurity firewall Vagrant (libvirt) box](/resources/docs/vagrant-libvirt/build-nethsecurity-firewall-vagrant-libvirt-box.md) -->
 
 ### Setup VMs
 
+VM implementations are divided into logical network segments as shown in the topology. Follow the implementation order below to ensure all components work successfully.
+
+#### Internet Segment
+
 * [VyOS router](/resources/docs/vm-setup/setup-vyos-router.md)
-* [Cisco Catalyst 8kv router](/resources/docs/vm-setup/setup-cisco-8kv-router.md)
+* [Kali Linux](/resources/docs/vm-setup/setup-kali-linux.md)
+* [Email server](/resources/docs/vm-setup/setup-email-server.md)
+* [C2 server](/resources/docs/vm-setup/setup-c2-server.md)
+<!-- * [Payload server](/resources/docs/vm-setup/setup-payload-server.md) -->
+
+#### HQ Server Segment
+
+<!-- * [Nethsecurity firewall](/resources/docs/vm-setup/setup-nethsecurity-firewall.md) -->
 * [FortiGate firewall](/resources/docs/vm-setup/setup-fortigate-firewall.md)
 * [Open vSwitch](/resources/docs/vm-setup/setup-ovs-switches.md)
-* [Cumulus switch](/resources/docs/vm-setup/setup-cumulus-switches.md)
 * [ELK](/resources/docs/vm-setup/setup-elk.md)
 * [Velociraptor](/resources/docs/vm-setup/setup-velociraptor.md)
 * [n8n](/resources/docs/vm-setup/setup-n8n.md)
 * [DFIR-IRIS](/resources/docs/vm-setup/setup-dfir-iris.md)
-* [NAS](/resources/docs/vm-setup/setup-nas.md)
-* [Kali Linux](/resources/docs/vm-setup/setup-kali-linux.md)
-* [Email server](/resources/docs/vm-setup/setup-email-server.md)
-* [C2 server](/resources/docs/vm-setup/setup-c2-server.md)
 * [CAPEv2](/resources/docs/vm-setup/setup-capev2.md)
-* [Windows workstation](/resources/docs/vm-setup/setup-windows-workstation.md)
-* [Branch host](/resources/docs/vm-setup/setup-branch-host.md)
-<!-- * [Build NethSecurity firewall Vagrant (libvirt) box](/resources/docs/vagrant-libvirt/build-nethsecurity-firewall-vagrant-libvirt-box.md) -->
-<!-- * [Payload server](/resources/docs/vm-setup/setup-payload-server.md) -->
+* [Cuckoo3](/resources/docs/vm-setup/setup-cuckoo3.md)
 <!-- * [Windows server](/resources/docs/vm-setup/setup-windows-server.md) -->
-<!-- * [Nethsecurity firewall](/resources/docs/vm-setup/setup-nethsecurity-firewall.md) -->
+
+#### HQ User Segment
+
+* [Windows workstation](/resources/docs/vm-setup/setup-windows-workstation.md)
+* [NAS](/resources/docs/vm-setup/setup-nas.md)
+
+#### Branch-1 Segment
+
+* [Cisco Catalyst 8kv router](/resources/docs/vm-setup/setup-cisco-8kv-router.md)
+* [Cumulus switch](/resources/docs/vm-setup/setup-cumulus-switches.md)
+* [Branch host](/resources/docs/vm-setup/setup-branch-host.md)
 
 ---
 
@@ -62,7 +76,9 @@ This section will provide instructions on how to generate events, build queries,
             - [Suspicious Configuration Change Sequence on Cisco IOS Device](/resources/attack-detect-scenarios/initial-access/network-service/common-service-attack/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device.md)
     - Remote Admin Tools (Windows)
         - [Remote connection followed by suspicious process execution](/resources/attack-detect-scenarios/initial-access/remote-admin-tools-windows/remote-connection-followed-by-suspicious-process-execution/Remote-connection-followed-by-suspicious-process-execution.md)
-
+- **Execution**
+    - PowerShell
+        - [Suspicious PowerShell Download and Execute Pattern](/resources/attack-detect-scenarios/execution/suspicious-powershell-download-and-execute-pattern/Suspicious-PowerShell-Download-and-Execute-Pattern.md)
 ---
 
 ## n8n workflows
@@ -70,6 +86,8 @@ This section will provide instructions on how to generate events, build queries,
 This section will provide instructions on how to create n8n workflows based on the Elastic rules above, adding automation, enrichment, AI analysis, case management, report generation, integration with other solutions, and much more.
 
 * [Suspicious Configuration Change Sequence on Cisco IOS Device](/resources/n8n-workflows/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/n8n-Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device.md)
+
+<!-- * [Suspicious PowerShell Download and Execute Pattern]() -->
 
 ## Disclaimer
 

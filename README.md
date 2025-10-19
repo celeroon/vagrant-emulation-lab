@@ -86,8 +86,7 @@ This section will provide instructions on how to generate events, build queries,
 This section will provide instructions on how to create n8n workflows based on the Elastic rules above, adding automation, enrichment, AI analysis, case management, report generation, integration with other solutions, and much more.
 
 * [Suspicious Configuration Change Sequence on Cisco IOS Device](/resources/n8n-workflows/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/n8n-Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device.md)
-
-<!-- * [Suspicious PowerShell Download and Execute Pattern]() -->
+* [Suspicious PowerShell Download and Execute Pattern](/resources/n8n-workflows/Suspicious-PowerShell-Download-and-Execute-Pattern/n8n-Suspicious-PowerShell-Download-and-Execute-Pattern.md)
 
 ## Disclaimer
 

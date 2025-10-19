@@ -49,6 +49,12 @@ Updates and upgrades system packages
 sudo apt update && sudo apt upgrade -y
 ```
 
+Install required tools
+
+```bash
+sudo apt install jq -y
+```
+
 Add attached `/dev/vdb` disk to existing LVM:
 
 - Check already created LVM (get a volume name)

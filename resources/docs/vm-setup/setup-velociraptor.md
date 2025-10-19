@@ -13,6 +13,7 @@ Before accessing the Velociraptor VM, copy the server and client config:
 ```bash
 scp -i ~/.vagrant.d/insecure_private_key ./ansible/artifacts/server.config.yaml vagrant@192.168.225.108:/home/vagrant
 scp -i ~/.vagrant.d/insecure_private_key ./ansible/artifacts/client.config.yaml vagrant@192.168.225.108:/home/vagrant
+scp -i ~/.vagrant.d/insecure_private_key ./ansible/artifacts/api.config.yaml vagrant@192.168.225.108:/home/vagrant
 ```
 
 Or using `vagrant scp`:
@@ -20,6 +21,7 @@ Or using `vagrant scp`:
 ```bash
 vagrant scp ./ansible/artifacts/server.config.yaml velociraptor-1:/home/vagrant/
 vagrant scp ./ansible/artifacts/client.config.yaml velociraptor-1:/home/vagrant/
+vagrant scp ./ansible/artifacts/api.config.yaml velociraptor-1:/home/vagrant/
 ```
 
 Access the VM by name using `vagrant ssh` or via the management IP shown in the [topology](/resources/images/vagrant-lab-virtual-topology.svg).
@@ -41,7 +43,7 @@ cd /opt/velociraptor/
 Install required packages:
 
 ```bash
-sudo apt update && sudo apt install curl -y
+sudo apt update && sudo apt install curl python3-pip jq -y
 ```
 
 Move server and client configuration files to the Velociraptor directory:
@@ -49,6 +51,7 @@ Move server and client configuration files to the Velociraptor directory:
 ```bash
 sudo mv /home/vagrant/server.config.yaml ./server.config.yaml
 sudo mv /home/vagrant/client.config.yaml ./client.config.yaml
+sudo mv /home/vagrant/api.config.yaml ./api.config.yaml
 ```
 
 Download Velociraptor Linux binary:
@@ -106,6 +109,26 @@ Or using `vagrant scp`:
 vagrant scp velociraptor-1:/opt/velociraptor/velociraptor.exe ./ansible/artifacts/velociraptor.exe
 ```
 
+Install pyvelociraptor
+
+```bash
+pip3 install pyvelociraptor
+```
+
+Add ~/.local/bin to your PATH so you can run pyvelociraptor without specifying the full path:
+
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Verify
+
+```bash
+which pyvelociraptor
+pyvelociraptor --help
+```
+
 Set ownership of `/opt/velociraptor` recursively (run on the Velociraptor node):
 
 ```bash
@@ -119,3 +142,11 @@ sudo systemctl restart velociraptor_server.service
 ```
 
 Default usernames/passwords are preconfigured: `vagrant` / `vagrant`. Access Velociraptor at: `https://172.16.10.8:8889`
+
+Reference:
+
+- Create API config
+
+```bash
+velociraptor --config server.config.yaml config api_client --name vagrant --role api,administrator api.config.yaml
+```

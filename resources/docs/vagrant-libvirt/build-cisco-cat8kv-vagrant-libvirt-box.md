@@ -1,6 +1,6 @@
 # Build Cisco Catalyst Vagrant (libvirt) box
 
-To get the image, a service contract is required. I will deploy version 17.10.01a of Cisco Cat8kv. In this lab, it will function as a branch router. This is an optional deployment, you can omit it.
+To get the image, a service contract is required. I will deploy version 17.10.01a of Cisco Cat8kv. In this lab, it will function as a branch router. This is an optional deployment, you can omit it if you do not want to follow scenarios and workflows.
 
 In the main working directory, clone and enter the repository.
 

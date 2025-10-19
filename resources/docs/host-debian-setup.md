@@ -15,13 +15,13 @@ sudo apt update && sudo apt install git -y
 Clone project
 
 ```bash
-git clone https://github.com/celeroon/vagrant-libvirt-labs $HOME/vagrant-libvirt-labs
+git clone https://github.com/celeroon/vagrant-emulation-lab $HOME/vagrant-emulation-lab
 ```
 
 Go to the project directory (this will be the main working directory for this project):
 
 ```bash
-cd $HOME/vagrant-libvirt-labs
+cd $HOME/vagrant-emulation-lab
 ```
 
 - [Install RDP with Xrdp](#install-rdp-with-xrdp)

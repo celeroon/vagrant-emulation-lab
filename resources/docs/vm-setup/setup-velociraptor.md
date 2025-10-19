@@ -2,6 +2,9 @@
 
 In this section we will setup Velociraptor Server to later add an Windows Agent.
 
+> [!WARNING]  
+> This configuration contains pre-configured certificates. **DO NOT use these configs in production or persistent environments.**
+
 Run VM
 
 ```bash
@@ -144,6 +147,12 @@ sudo systemctl restart velociraptor_server.service
 Default usernames/passwords are preconfigured: `vagrant` / `vagrant`. Access Velociraptor at: `https://172.16.10.8:8889`
 
 Reference:
+
+- Generate configuration files for server and client:
+
+```bash
+./velociraptor-v0.74.5-linux-amd64 config generate -i
+```
 
 - Create API config
 

@@ -15,8 +15,10 @@ System requirements (minimum):
 - **48 GB RAM**
 - **200 GB disk space** (depending on how long you plan to keep your lab running)
 
-Even if I said not to use nested virtualization (especially on old hardware) - I will run a Debian 12 VM under Fedora Linux on my laptop to test the instructions for this lab one more time.
+Even if I said not to use nested virtualization (especially on old hardware) - I will run a Debian 12 VM under Fedora Linux on my laptop to test the instructions for this lab separately for each VM (not full environment) one more time.
 
 <div align="center">
     <img alt="Main host neowofetch" src="/resources/images/main-host-neowofetch.png" width="100%">
 </div>
+
+The more you deploy - the more CPU, RAM, and disk space you require.

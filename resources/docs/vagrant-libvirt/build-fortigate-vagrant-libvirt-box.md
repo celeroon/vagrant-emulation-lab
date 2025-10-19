@@ -95,7 +95,7 @@ vagrant ssh fortigate-1
 
 There is a problem with newer versions of FortiGate that require an evaluation license to activate - they cannot accept the current configuration provided via Packer. When you try to register, you will get the error `Requesting FortiCare Trial license, proxy:(null)`. To fix this, reset the config by running `execute factoryreset` and confirm. You will lose the SSH connection, and after a few minutes you can go to `https://192.168.225.10` in your localhost browser, log in to FortiGate using `admin` / `admin` as credentials, and register your FortiGate. After reboot, disable any features, then you can either leave the VM running or shut it down for now.
 
-You can use the same logic to build a FortiGate 7.2.0 box, but you will not be asked to register the VM - instead, you will have 15 days of trial access. Keep in mind that you need to uncomment and change the FortiGate version in `/vms/firewalls/fortigate/config.rb` if you want to test multiple versions.
+You can use the same logic to build a FortiGate 7.2.0 box, but you will not be asked to register the VM - instead, you will have 15 days of trial access. Keep in mind that you need to uncomment and change the FortiGate version in the [config file](/vms/firewalls/fortigate/config.rb) if you want to test multiple versions.
 
 ```bash
 # node.vm.box_version = "7.2.0"

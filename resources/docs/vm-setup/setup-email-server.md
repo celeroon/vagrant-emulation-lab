@@ -1,9 +1,6 @@
 # Setup Email Server
 
-In this section I’ll show how to set up an email server where you can generate local emails using a Python script (to emulate phishing). I won’t provide malicious programs — build those yourself based on your emulation scenario. This guide creates the core of the lab. Some related examples are on my blog:
-
-* [https://diadenkov.medium.com/8-lavael-implementing-mitre-ttp-based-hunting-v-diagram-methodology-5f8bef8019e4](https://diadenkov.medium.com/8-lavael-implementing-mitre-ttp-based-hunting-v-diagram-methodology-5f8bef8019e4)
-* [https://diadenkov.medium.com/9-lavael-report-52ebdce5b3d8](https://diadenkov.medium.com/9-lavael-report-52ebdce5b3d8)
+In this section I’ll show how to set up an email server where you can generate local emails using a Python script (to emulate phishing).
 
 Run the VM:
 

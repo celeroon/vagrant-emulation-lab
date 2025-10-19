@@ -1,0 +1,884 @@
+{
+  "name": "Suspicious-PowerShell-Download-and-Execute-Pattern",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        -1120
+      ],
+      "id": "ec14ec06-4fb2-4b39-8d0b-80ccd78996b6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "indexId": ".alerts-security.alerts-default",
+        "returnAll": true,
+        "options": {
+          "query": "{\n  \"query\": {\n    \"bool\": {\n      \"must\": [\n        { \"term\": { \"kibana.alert.workflow_status\": \"open\" } },\n        { \"term\": { \"kibana.alert.rule.name\": \"ESQL - Suspicious PowerShell Download and Execute Pattern\" } },\n        {\n          \"range\": {\n            \"@timestamp\": {\n              \"gte\": \"now-15m\",\n              \"lte\": \"now\"\n            }\n          }\n        }\n      ]\n    }\n  },\n  \"sort\": [\n    { \"@timestamp\": { \"order\": \"desc\" } }\n  ]\n}"
+        }
+      },
+      "type": "n8n-nodes-base.elasticsearch",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -1120
+      ],
+      "id": "a4ec692a-153d-4998-a1fd-6563d3fa4177",
+      "name": "ES-GET-ALERTS",
+      "credentials": {
+        "elasticsearchApi": {
+          "id": "HH6KoGNTkC965DJr",
+          "name": "elk-1-creds"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=sudo pyvelociraptor --config /opt/velociraptor/api.config.yaml \\\n  \"SELECT client_id FROM clients() WHERE os_info.hostname = '{{$json.host.name}}'\" \\\n  2>&1 | tail -n 1 \\\n  | python3 -c 'import sys,ast; print(ast.literal_eval(sys.stdin.read())[0][\"client_id\"])'",
+        "cwd": "/home/vagrant/"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        -928
+      ],
+      "id": "d3bc7801-f152-44fa-b3ac-c327ab9d61f7",
+      "name": "ssh-VELO-GET-CID",
+      "credentials": {
+        "sshPassword": {
+          "id": "wTBBwD7KG0SZCUHd",
+          "name": "VELOCIRAPTOR"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=sudo pyvelociraptor --config /opt/velociraptor/api.config.yaml \\\n\"SELECT collect_client(\n    client_id='{{ $('ssh-VELO-GET-CID').item.json.stdout }}',\n    artifacts=['Windows.Search.FileFinder'],\n    env=dict(\n      SearchFilesGlobTable='Glob\\n{{ $json.file.path }}',\n      Accessor='auto',\n      Upload_File='Y',\n      Calculate_Hash='Y'\n    )\n  ).flow_id AS flow_id FROM scope()\" \\\n2>&1 | tail -n 1 | python3 -c 'import sys,ast; print(ast.literal_eval(sys.stdin.read())[0][\"flow_id\"])'"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        -928
+      ],
+      "id": "4aebd571-535b-4e5b-aa1c-21fd2bc025cb",
+      "name": "ssh-VELO-GET-FID",
+      "credentials": {
+        "sshPassword": {
+          "id": "wTBBwD7KG0SZCUHd",
+          "name": "VELOCIRAPTOR"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "51eb1990-68c7-4b50-a159-b243e5f1a860",
+              "name": "kibana.alert.original_time",
+              "value": "={{ $json['out.timestamp'] }}",
+              "type": "string"
+            },
+            {
+              "id": "32a673b3-39ae-4fb0-82e8-5e950ba31c10",
+              "name": "user.name",
+              "value": "={{ $json['user.name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "57bd71af-b90e-4ccf-a76d-6482af50cad1",
+              "name": "host.name",
+              "value": "={{ $json['host.name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "6e081260-b3c8-423a-adc6-49c92206348c",
+              "name": "event.action",
+              "value": "={{ $json['out.event.action'] }}",
+              "type": "string"
+            },
+            {
+              "id": "76d1b76d-43f4-43e1-a377-6475f2ae9bad",
+              "name": "process.command_line",
+              "value": "={{ $json['out.process.command.line'] }}",
+              "type": "string"
+            },
+            {
+              "id": "2de90f82-523d-42f1-b29b-bd75412760bc",
+              "name": "file.path",
+              "value": "={{ $json['out.file.path'] }}",
+              "type": "string"
+            },
+            {
+              "id": "d26cba50-c156-413c-a7b3-6f9a14b2de9e",
+              "name": "file.name",
+              "value": "={{ $json['out.file.name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "1c1bd60d-df73-4098-b183-f82689b4b249",
+              "name": "kibana.alert.uuid",
+              "value": "={{ $json[\"kibana.alert.uuid\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "460248b2-5253-4d6f-8e42-64cac4e237bb",
+              "name": "=kibana.alert.rule.name",
+              "value": "={{ $json['kibana.alert.rule.name'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        -1120
+      ],
+      "id": "ea7a51a7-be13-457a-a7f9-a95c7bf5f356",
+      "name": "ES-EXTRACT-DATA"
+    },
+    {
+      "parameters": {
+        "command": "=sudo pyvelociraptor --config /opt/velociraptor/api.config.yaml \\\n\"SELECT OSPath, Upload FROM flow_results(\n    client_id='{{ $('ssh-VELO-GET-CID').item.json.stdout }}',\n    flow_id='{{ $('ssh-VELO-GET-FID').item.json.stdout }}',\n    artifact='Windows.Search.FileFinder'\n)\""
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        96,
+        -928
+      ],
+      "id": "73a50f3c-5dd8-4b4b-8b77-92a76d24a242",
+      "name": "ssh-VELO-DOWNLOAD-FILE",
+      "credentials": {
+        "sshPassword": {
+          "id": "wTBBwD7KG0SZCUHd",
+          "name": "VELOCIRAPTOR"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=CID=\"{{ $('ssh-VELO-GET-CID').item.json.stdout }}\"\nFID=\"{{ $('ssh-VELO-GET-FID').item.json.stdout }}\"\nWPATH='{{ $('FORMAT-FILE-PATH').item.json.file.path }}'\nBASE=\"/opt/velociraptor/clients/$CID/collections/$FID/uploads\"\n\n# Transform Windows path to Unix relative path\nREL=\"$(printf \"%s\" \"$WPATH\" | sed -E 's|^[A-Za-z]:[\\\\/]+||' | tr '\\\\' '/')\"\nBASENAME=\"$(basename \"$REL\")\"\n\n# Option 1: Case-insensitive path match (better for Windows paths)\nSRC=\"$(sudo find \"$BASE\" -type f \\( -ipath \"*/$REL\" -o -iname \"$BASENAME\" \\) -print -quit 2>/dev/null)\"\n\n# Option 2: Find all matches and choose the best one\n# mapfile -t MATCHES < <(sudo find \"$BASE\" -type f \\( -ipath \"*/$REL\" -o -iname \"$BASENAME\" \\) 2>/dev/null)\n# if [ ${#MATCHES[@]} -gt 1 ]; then\n#   echo \"Warning: Multiple matches found\" >&2\n#   printf '%s\\n' \"${MATCHES[@]}\" >&2\n# fi\n# SRC=\"${MATCHES[0]}\"\n\nif [ -n \"$SRC\" ]; then\n  echo \"$SRC\"\nelse\n  echo \"Not found: $WPATH\" >&2\n  exit 1\nfi"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -928
+      ],
+      "id": "98c7d8d6-8a92-4671-a304-13930a3eefc2",
+      "name": "ssh-VELO-GET-FILE-PATH",
+      "credentials": {
+        "sshPassword": {
+          "id": "wTBBwD7KG0SZCUHd",
+          "name": "VELOCIRAPTOR"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const filePath = $(\"ES-EXTRACT-DATA\").first().json.file.path;\nconst modifiedPath = filePath.replace(/\\\\/g, '//');\nreturn {\n  json: {\n    file: {\n      path: modifiedPath\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        -928
+      ],
+      "id": "1c35f26b-5137-4c10-9569-5050cd9e0b3c",
+      "name": "FORMAT-FILE-PATH"
+    },
+    {
+      "parameters": {
+        "command": "sudo -u cuckoo /home/cuckoo/cuckoo3/venv/bin/cuckoo --cwd /home/cuckoo/.cuckoocwd api token --list | awk -F'|' '/^\\|.*[0-9].*\\|/ {gsub(/[[:space:]]/, \"\", $6); print $6}'"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        592,
+        -928
+      ],
+      "id": "74a7317f-af3c-4182-b1f9-5309883accf9",
+      "name": "ssh-CUCKOO-GET-API-KEY",
+      "credentials": {
+        "sshPassword": {
+          "id": "JYKpEDIzghFqgVAz",
+          "name": "CUCKOO3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=sudo curl -sS http://172.16.10.3:8090/submit/file \\\n  -H \"Authorization: token {{ $json.stdout }}\" \\\n  -F \"file=@{{ $('ssh-VELO-GET-FILE-PATH').item.json.stdout }}\" \\\n  -F 'settings={\"platforms\":[{\"platform\":\"windows\",\"os_version\":\"10\"}],\"timeout\":120}' \\\n  | jq -r '.analysis_id'"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -928
+      ],
+      "id": "44f8eb10-8e5c-46d2-ad92-37c9237b76b5",
+      "name": "ssh-VELO-SUBMIT-FILE-TO-CUCKOO",
+      "credentials": {
+        "sshPassword": {
+          "id": "wTBBwD7KG0SZCUHd",
+          "name": "VELOCIRAPTOR"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=http://172.16.10.3:8090/analysis/{{ $json.stdout }}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"token {{ $('ssh-CUCKOO-GET-API-KEY').item.json.stdout }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -576,
+        -736
+      ],
+      "id": "f99d5ad6-d32f-4938-bf38-d60f59f39e1a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1a2905f4-5bec-4bf9-b4c2-cc4f12a265aa",
+              "leftValue": "={{ $json.state }}",
+              "rightValue": "finished",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -352,
+        -736
+      ],
+      "id": "d241c30a-acb3-4089-8dd9-9d915727f0a5",
+      "name": "If",
+      "alwaysOutputData": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "996d9380-2395-404a-a46d-5076f049f7f1",
+              "name": "submitted.md5",
+              "value": "={{ $json.submitted.md5 }}",
+              "type": "string"
+            },
+            {
+              "id": "8fb87622-5e67-43b1-ba23-d5b0b1b264cf",
+              "name": "submitted.sha1",
+              "value": "={{ $json.submitted.sha1 }}",
+              "type": "string"
+            },
+            {
+              "id": "eb3500fe-c459-4098-a17f-95c06c64675d",
+              "name": "submitted.sha256",
+              "value": "={{ $json.submitted.sha256 }}",
+              "type": "string"
+            },
+            {
+              "id": "51ef399e-a692-4bac-a53a-631ffc7779a2",
+              "name": "submitted.sha512",
+              "value": "={{ $json.submitted.sha512 }}",
+              "type": "string"
+            },
+            {
+              "id": "c096bb76-28c2-4b32-a54b-44809da20d74",
+              "name": "state",
+              "value": "={{ $json.state }}",
+              "type": "string"
+            },
+            {
+              "id": "8d4369e4-42d6-451a-8344-a380b101d471",
+              "name": "settings.platforms[0].platform",
+              "value": "={{ $json.settings.platforms[0].platform }}",
+              "type": "string"
+            },
+            {
+              "id": "369991e6-0c7c-446f-b7c0-eb4ca72fadae",
+              "name": "settings.platforms[0].os_version",
+              "value": "={{ $json.settings.platforms[0].os_version }}",
+              "type": "string"
+            },
+            {
+              "id": "dcfc0148-a4cb-42c2-823b-82b5147f6dd4",
+              "name": "tasks[0].id",
+              "value": "={{ $json.tasks[0].id }}",
+              "type": "string"
+            },
+            {
+              "id": "fed36159-5e90-4573-b154-309137fa8e27",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        -752
+      ],
+      "id": "11674fb7-6e43-4132-84f2-1404880f49f8",
+      "name": "CUCKOO-GET-TASK-STATS"
+    },
+    {
+      "parameters": {
+        "url": "=http://172.16.10.3:8090/analysis/{{ $json.id }}/task/{{ $json.tasks.last().id }}/post",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"token {{ $('ssh-CUCKOO-GET-API-KEY').item.json.stdout }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        96,
+        -576
+      ],
+      "id": "40161a98-7963-4d84-bef8-80e3629f18fe",
+      "name": "CUCKOO-GET-TASK-ANALYSIS"
+    },
+    {
+      "parameters": {
+        "preBuiltAgentsCalloutHttpRequest": "",
+        "httpVariantWarning": "",
+        "curlImport": "",
+        "method": "GET",
+        "": "",
+        "url": "=https://www.virustotal.com/api/v3/files/{{ $json.submitted.md5 }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "virusTotalApi",
+        "provideSslCertificates": false,
+        "sendQuery": false,
+        "sendHeaders": false,
+        "sendBody": false,
+        "options": {},
+        "infoMessage": ""
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        96,
+        -752
+      ],
+      "id": "1e384ed0-ba2b-4769-93d8-58b0006fee67",
+      "name": "VT-CHECK-HASH",
+      "alwaysOutputData": true,
+      "extendsCredential": "virusTotalApi",
+      "credentials": {
+        "virusTotalApi": {
+          "id": "KoltlDWmaKNlcQs2",
+          "name": "VirusTotal creds"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "screenshot",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -576
+      ],
+      "id": "016d1cd8-4549-48b6-8366-9eef984e2cdb",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "url": "=http://172.16.10.3:8090/analysis/{{ $('CUCKOO-GET-TASK-STATS').item.json.id }}/task/{{ $('CUCKOO-GET-TASK-STATS').item.json.tasks.last().id }}/screenshot/{{$json.name}}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Authorization\": \"token {{ $('ssh-CUCKOO-GET-API-KEY').item.json.stdout }}\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        -576
+      ],
+      "id": "23afd788-3f15-47d6-a10f-db0553434239",
+      "name": "CUCKOO-GET-IMAGES"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "processes.process_list",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -752
+      ],
+      "id": "598eb1e7-d75b-4aed-a789-02a37c1e6bbf",
+      "name": "CUCKOO-ANALYSIS-GET-PROCESSES"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "process",
+        "include": "specifiedFields",
+        "fieldsToInclude": "commandline",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        592,
+        -752
+      ],
+      "id": "e111ce8c-cc10-48fc-93d3-405d8987982f",
+      "name": "EXTRACT-COMMAND_LINES"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "=Analyze this screenshot to detect application windows with READABLE TEXT CONTENT.\n\nSTRICT DETECTION RULES:\n1. Window must be open AND fully loaded\n2. Text must be visible INSIDE the window's content area (NOT just the title bar)\n3. IGNORE: Window title bars, taskbar text, desktop icons\n4. IGNORE: Empty windows, blank windows, black screens, white screens, loading windows\n5. Only detect windows where the MAIN CONTENT AREA contains readable text, dialog messages, documents, or UI elements with text\n\nIMAGE FILENAME: {{ $json.name }}\n\nCRITICAL OUTPUT RULES:\n- Return ONLY raw JSON on a single line\n- DO NOT wrap in markdown code fences (no ```)\n- DO NOT add any explanations or extra text\n- DO NOT use backticks\n\nCORRECT FORMAT:\n{\"filename\":\"{{ $json.name }}\"}\nor\n{}\n\nWRONG FORMAT (DO NOT USE):\n```json\n{\"filename\":\"example.jpg\"}\n```\n\nYour response must be raw JSON only:\n```\n\n## Alternative - Ultra Simple:\n```\nDoes this screenshot show a window with visible text in the content area (ignore title bars)?\n\nImage: {{ $json.name }}\n\nRules:\n- Empty/loading windows = NO\n- Only title bar visible = NO\n- Text in window body = YES\n\nReturn ONLY this (no markdown, no code fences, no backticks):\n{\"filename\":\"{{ $json.name }}\"} if YES\n{} if NO",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        832,
+        -576
+      ],
+      "id": "4c147751-8cf4-46b8-9514-987e70c8f84a",
+      "name": "Analyze image",
+      "executeOnce": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "GD2meViYqImB9jMW",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse all content and extract filenames\nconst filenames = [];\n\nfor (const item of $input.all()) {\n  const content = JSON.parse(item.json.content);\n  \n  if (content.filename) {\n    filenames.push(content.filename);\n  }\n}\n\n// Return as single item with array\nreturn [\n  {\n    json: {\n      filenames: filenames\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -576
+      ],
+      "id": "7cf627b6-7d94-4574-8f3e-13a101b508ae",
+      "name": "GET-AI-IMAGES"
+    },
+    {
+      "parameters": {
+        "mode": "combineBySql",
+        "numberInputs": 3,
+        "query": "SELECT * FROM input1 \nLEFT JOIN input2 ON input1.name = input2.id\nLEFT JOIN input3 ON 1=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1264,
+        -960
+      ],
+      "id": "05f1c449-9fe0-479c-8fb5-77795c8f34a9",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// PDF-friendly HTML generator for security alerts\n// Use with data from previous node (e.g., Merge node)\n\nfunction escapeHtml(str) {\n  if (!str) return '';\n  return String(str)\n    .replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;')\n    .replace(/\"/g, '&quot;');\n}\n\n// Process all items from the Merge node\nreturn $items().map(item => {\n  const alertData = item.json;\n  \n  const alert = alertData.kibana?.alert || {};\n  const user = alertData.user || {};\n  const host = alertData.host || {};\n  const event = alertData.event || {};\n  const file = alertData.file || {};\n  const processes = alertData.process || [];\n  const filenames = alertData.filenames || [];\n\n  // Build image index from CUCKOO-GET-IMAGES node\n  const imageItems = $items('CUCKOO-GET-IMAGES');\n  const imageMap = new Map();\n  \n  imageItems.forEach(imgItem => {\n    const name = imgItem.json?.name;\n    const binary = imgItem.binary?.data;\n    if (name && binary) {\n      const mimeType = binary.mimeType || 'image/jpeg';\n      const base64Data = binary.data;\n      imageMap.set(name, { mimeType, base64Data });\n    }\n  });\n\n  // Generate process list HTML (dynamic)\n  const processListHTML = processes.length > 0 \n    ? processes.map(proc => {\n        const cmd = proc.commandline || '';\n        return `        <div class=\"process-item\">${escapeHtml(cmd)}</div>`;\n      }).join('\\n')\n    : '        <div class=\"process-item muted\">No process information available</div>';\n\n  // Generate screenshots HTML (dynamic with actual images)\n  const screenshotsHTML = filenames.length > 0\n    ? filenames.map(filename => {\n        const imageData = imageMap.get(filename);\n        if (imageData && imageData.base64Data) {\n          const src = `data:${imageData.mimeType};base64,${imageData.base64Data}`;\n          return `<figure class=\"shot\">\n  <img src=\"${src}\" alt=\"${escapeHtml(filename)}\" />\n  <figcaption>${escapeHtml(filename)}</figcaption>\n</figure>`;\n        } else {\n          return `<div class=\"warn\">Image not found: ${escapeHtml(filename)}</div>`;\n        }\n      }).join('\\n')\n    : '<div class=\"mono\">No screenshots available</div>';\n\n  const html = `<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Security Alert Report</title>\n<style>\n  /* ---------- Page & typography ---------- */\n  @page { size: A4; margin: 12mm 12mm 14mm 12mm; }\n  html, body {\n    background: #fff; color: #111;\n    font-family: \"Inter\", \"Segoe UI\", Roboto, Arial, sans-serif;\n    font-size: 12pt; line-height: 1.35;\n    margin: 0;\n    padding: 0;\n  }\n  * {\n    box-sizing: border-box;\n  }\n  h1,h2 { margin: 0 0 6pt; line-height: 1.2; }\n  h1 { font-size: 16pt; font-weight: 600; }\n  h2 { font-size: 12.5pt; color: #0f172a; font-weight: 600; }\n  small, .muted { color: #566; font-size: 10pt; }\n  .k { font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }\n\n  /* ---------- Layout ---------- */\n  .wrap { max-width: 180mm; margin: 0 auto; }\n  .header, .footer { position: fixed; left: 0; right: 0; color: #566; }\n  .header { top: 0; padding: 6mm 12mm 0 12mm; border-bottom: 1px solid #e4eaf2; background: #fff; }\n  .footer { bottom: 0; padding: 0 12mm 6mm 12mm; border-top: 1px solid #e4eaf2; text-align: center; background: #fff; }\n  .spacer-header { height: 14mm; }\n  .spacer-footer { height: 14mm; }\n\n  .card { \n    border: 2px solid #dc2626; \n    border-radius: 8px; \n    padding: 12pt; \n    margin-bottom: 12pt; \n    background: #fef2f2;\n  }\n  .section { \n    background: #f7f9fc; \n    border: 1px solid #e4eaf2; \n    border-radius: 6px; \n    padding: 10pt; \n    margin: 0 0 10pt 0; \n    break-inside: avoid; \n  }\n  \n  table.meta { width: 100%; border-collapse: collapse; }\n  table.meta td { padding: 4pt 0; vertical-align: top; }\n  table.meta td:first-child { width: 38mm; color: #475569; font-weight: 500; }\n\n  .mono {\n    background: #fff; \n    border: 1px solid #e4eaf2; \n    border-radius: 4px;\n    padding: 8pt; \n    overflow-wrap: anywhere; \n    white-space: pre-wrap;\n    font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;\n    font-size: 9.5pt; \n    line-height: 1.4;\n    margin: 4pt 0;\n  }\n\n  /* ---------- Screenshots ---------- */\n  .shot { \n    width: 100%; \n    max-width: 100%;\n    max-height: 110mm;\n    border: 1px solid #e6ecf2; \n    border-radius: 6px; \n    padding: 6pt; \n    break-inside: avoid; \n    background: #fff;\n    margin-bottom: 10pt;\n    page-break-inside: avoid;\n    page-break-after: auto;\n    box-sizing: border-box;\n  }\n  .shot img { \n    display: block; \n    width: 100%; \n    max-height: 95mm;\n    object-fit: contain;\n    height: auto; \n    border-radius: 4px; \n    border: 1px solid #e4eaf2;\n  }\n  .shot figcaption { \n    text-align: center; \n    font-size: 9pt; \n    color: #475569; \n    margin-top: 4pt; \n    word-break: break-all; \n  }\n\n  .warn {\n    color: #b91c1c;\n    background: #fef2f2;\n    padding: 6pt 8pt;\n    border: 1px solid #fca5a5;\n    border-radius: 4px;\n    font-size: 9.5pt;\n  }\n\n  .badge { \n    display: inline-block; \n    padding: 3pt 8pt; \n    border: 1px solid #dc2626; \n    border-radius: 4px; \n    font-size: 10pt; \n    color: #dc2626; \n    background: #fff;\n    font-weight: 500;\n  }\n\n  .process-list {\n    background: #fff;\n    border: 1px solid #e4eaf2;\n    border-radius: 4px;\n    padding: 0;\n    margin: 4pt 0;\n    max-height: 400pt;\n    overflow: visible;\n  }\n\n  .process-item {\n    padding: 6pt 8pt;\n    border-bottom: 1px solid #f1f5f9;\n    font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;\n    font-size: 9.5pt;\n    line-height: 1.4;\n    overflow-wrap: anywhere;\n  }\n\n  .process-item:last-child {\n    border-bottom: none;\n  }\n\n  /* ---------- Page breaks ---------- */\n  .section, .shot, table, pre { page-break-inside: avoid; }\n  \n  .process-list { page-break-inside: auto; }\n</style>\n</head>\n<body>\n  <div class=\"header\"><div class=\"wrap\">\n    <span class=\"muted\">Security Alert Report • Generated: ${escapeHtml(new Date().toISOString())}</span>\n  </div></div>\n  \n  <div class=\"footer\"><div class=\"wrap\">\n    <span class=\"muted\">Alert UUID: ${escapeHtml(alert.uuid || 'N/A')}</span>\n  </div></div>\n\n  <div class=\"spacer-header\"></div>\n  <main class=\"wrap\">\n    <!-- Alert Header -->\n    <div class=\"card\">\n      <h1>Security Alert Detection</h1>\n      <div class=\"badge\">${escapeHtml(alert.rule?.name || 'Unknown Rule')}</div>\n      <div style=\"margin-top: 8pt;\">\n        <small class=\"muted\">Original Time: ${escapeHtml(alert.original_time || 'N/A')}</small>\n      </div>\n    </div>\n\n    <!-- Alert Details -->\n    <section class=\"section\">\n      <h2>Alert Information</h2>\n      <table class=\"meta\">\n        <tr><td>Alert UUID</td><td><span class=\"k\">${escapeHtml(alert.uuid || 'N/A')}</span></td></tr>\n        <tr><td>Rule Name</td><td>${escapeHtml(alert.rule?.name || 'N/A')}</td></tr>\n        <tr><td>Original Time</td><td>${escapeHtml(alert.original_time || 'N/A')}</td></tr>\n        <tr><td>Event Action</td><td>${escapeHtml(event.action || 'N/A')}</td></tr>\n      </table>\n    </section>\n\n    <!-- Host Information -->\n    <section class=\"section\">\n      <h2>Host Information</h2>\n      <table class=\"meta\">\n        <tr><td>Host Name</td><td><span class=\"k\">${escapeHtml(host.name || 'N/A')}</span></td></tr>\n        <tr><td>User Name</td><td>${escapeHtml(user.name || 'N/A')}</td></tr>\n      </table>\n    </section>\n\n    <!-- File Information -->\n    <section class=\"section\">\n      <h2>File Information</h2>\n      <table class=\"meta\">\n        <tr><td>File Path</td><td><span class=\"k\">${escapeHtml(file.path || 'N/A')}</span></td></tr>\n        <tr><td>File Name</td><td><span class=\"k\">${escapeHtml(file.name || 'N/A')}</span></td></tr>\n      </table>\n    </section>\n\n    <!-- Process Chain (Dynamic) -->\n    <section class=\"section\">\n      <h2>Process Chain (${processes.length} processes)</h2>\n      <div class=\"process-list\">\n${processListHTML}\n      </div>\n    </section>\n\n    <!-- Screenshots (Dynamic) -->\n    <section class=\"section\">\n      <h2>Evidence Screenshots (${filenames.length} files)</h2>\n    </section>\n${screenshotsHTML}\n  </main>\n  <div class=\"spacer-footer\"></div>\n</body>\n</html>`;\n\n  return { json: { ...alertData, html } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        -384
+      ],
+      "id": "9d8d1782-789e-4afd-acff-50b2e334ce97",
+      "name": "GENERATE-HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(it => {\n  const html = it.json.html || '<!doctype html><html><body>No HTML</body></html>';\n\n  return {\n    json: {\n      ...it.json,\n    },\n    binary: {\n      report_html: {\n        data: Buffer.from(html).toString('base64'),\n        mimeType: 'text/html',\n        fileExtension: 'html',\n        fileName: 'index.html',\n      }\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        -384
+      ],
+      "id": "352423b8-836e-4873-8c3f-c4f16ffd2037",
+      "name": "BUILD-HTML"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://172.16.10.7:3000/forms/chromium/convert/html",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "files",
+              "inputDataFieldName": "report_html"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -144,
+        -384
+      ],
+      "id": "7094e378-fc49-4c62-95cf-d9ff9ff7d7aa",
+      "name": "GENERATE-PDF"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "ES-GET-ALERTS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ES-GET-ALERTS": {
+      "main": [
+        [
+          {
+            "node": "ES-EXTRACT-DATA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ssh-VELO-GET-CID": {
+      "main": [
+        [
+          {
+            "node": "FORMAT-FILE-PATH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ES-EXTRACT-DATA": {
+      "main": [
+        [
+          {
+            "node": "ssh-VELO-GET-CID",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ssh-VELO-GET-FID": {
+      "main": [
+        [
+          {
+            "node": "ssh-VELO-DOWNLOAD-FILE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ssh-VELO-DOWNLOAD-FILE": {
+      "main": [
+        [
+          {
+            "node": "ssh-VELO-GET-FILE-PATH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FORMAT-FILE-PATH": {
+      "main": [
+        [
+          {
+            "node": "ssh-VELO-GET-FID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ssh-VELO-GET-FILE-PATH": {
+      "main": [
+        [
+          {
+            "node": "ssh-CUCKOO-GET-API-KEY",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ssh-CUCKOO-GET-API-KEY": {
+      "main": [
+        [
+          {
+            "node": "ssh-VELO-SUBMIT-FILE-TO-CUCKOO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ssh-VELO-SUBMIT-FILE-TO-CUCKOO": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "CUCKOO-GET-TASK-STATS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "CUCKOO-GET-TASK-STATS": {
+      "main": [
+        [
+          {
+            "node": "CUCKOO-GET-TASK-ANALYSIS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "VT-CHECK-HASH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CUCKOO-GET-TASK-ANALYSIS": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CUCKOO-ANALYSIS-GET-PROCESSES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "CUCKOO-GET-IMAGES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CUCKOO-ANALYSIS-GET-PROCESSES": {
+      "main": [
+        [
+          {
+            "node": "EXTRACT-COMMAND_LINES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CUCKOO-GET-IMAGES": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "GET-AI-IMAGES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET-AI-IMAGES": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "EXTRACT-COMMAND_LINES": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "GENERATE-HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GENERATE-HTML": {
+      "main": [
+        [
+          {
+            "node": "BUILD-HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BUILD-HTML": {
+      "main": [
+        [
+          {
+            "node": "GENERATE-PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "109aa032-9312-4272-be7b-af70430c3a77",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2585e239b8d2af12430778a53cc0428c32407b69945abf85ee6a18d7e1d9ada6"
+  },
+  "id": "8jf4HTAC26NIBiTK",
+  "tags": []
+}

@@ -274,7 +274,7 @@ sudo netfilter-persistent save
 Move back to the main host project directory and run the Windows 10 sandbox VM. If you changed the topology management addressing, make sure to edit the [Vagrantfile](/vms/linux/capev2/windows-sandobx/Vagrantfile)
 
 ```bash
-VAGRANT_CWD=$HOME/vagrant-manual-lab/vms/linux/capev2/windows-sandobx/ vagrant up
+VAGRANT_CWD=$HOME/vagrant-emulation-lab/vms/linux/capev2/windows-sandobx/ vagrant up
 ```
 
 It may take a while for Windows 10 to start up. While waiting for Vagrant to finish the job, you can already access the VM via VNC. Open **Remote Viewer** and provide the protocol, IP address, and port to connect: `vnc://192.168.225.104:5999`.

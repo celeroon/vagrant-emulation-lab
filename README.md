@@ -14,6 +14,8 @@ The topology of this project will change from time to time. I will add new guide
     <img alt="Vagrant Lab Virtual Topology" src="/resources/images/vagrant-lab-virtual-topology.svg" width="100%">
 </div>
 
+* [Lab Implementation Overview](/resources/docs/lab-implementation-overview.md)
+
 ## Manual lab setup
 
 This section provides guidelines for setting up the lab environment manually and can help anyone interested in a step-by-step implementation.
@@ -60,6 +62,12 @@ VM implementations are divided into logical network segments as shown in the top
 * [Cisco Catalyst 8kv router](/resources/docs/vm-setup/setup-cisco-8kv-router.md)
 * [Cumulus switch](/resources/docs/vm-setup/setup-cumulus-switches.md)
 * [Branch host](/resources/docs/vm-setup/setup-branch-host.md)
+
+---
+
+## Auto lab setup
+
+* [FortiGate firewall](/resources/docs/vm-auto-setup/auto-setup-fortigate-firewall.md)
 
 ---
 

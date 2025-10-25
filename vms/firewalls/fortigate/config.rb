@@ -25,12 +25,12 @@ config.vm.define "fortigate-1" do |node|
     :libvirt__tunnel_port => "10021",
     :libvirt__iface_name => "port3",
     :auto_config => false
-  # node.vm.provision "ansible" do |ansible|
-  #   ansible.compatibility_mode  = "2.0"
-  #   ansible.inventory_path      = "./ansible/inventory.ini"
-  #   ansible.playbook_command    = "./ansible/ansible-venv/bin/ansible-playbook"
-  #   ansible.playbook            = "./ansible/playbooks/fortigate-setup.yml"
-  #   ansible.config_file         = "./ansible/ansible.cfg"
-  #   ansible.verbose             = "v"
-  # end
+  node.vm.provision "ansible" do |ansible|
+    ansible.compatibility_mode  = "2.0"
+    ansible.inventory_path      = "./ansible/inventory.ini"
+    ansible.playbook_command    = "./ansible/ansible-venv/bin/ansible-playbook"
+    ansible.playbook            = "./ansible/playbooks/fortigate-setup.yml"
+    ansible.config_file         = "./ansible/ansible.cfg"
+    ansible.verbose             = "v"
+  end
 end

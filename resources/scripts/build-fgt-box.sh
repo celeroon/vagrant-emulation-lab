@@ -16,6 +16,12 @@ IMAGES_DIR="/var/lib/libvirt/images"
 REPO_URL="https://github.com/celeroon/fortigate-vagrant-libvirt"
 WORKDIR="/tmp/fortigate-vagrant-libvirt"
 
+# Cache sudo credentials for the entire script
+sudo -v
+
+# Keep sudo alive in background during long operations (like Packer build)
+while true; do sudo -n true; sleep 50; kill -0 "$$" || exit; done 2>/dev/null &
+
 echo "[1/8] Removing FortiGate domains..."
 sudo virsh list --all --name | grep -v '^$' | while read -r vm; do
   if sudo virsh dumpxml "$vm" | grep -qi "fortigate"; then
@@ -71,7 +77,28 @@ if [[ ! -f "$IMAGES_DIR/$IMAGE_NAME" ]]; then
   echo "  ERROR: $IMAGES_DIR/$IMAGE_NAME not found. Place the image first and re-run."
   exit 1
 fi
-sudo chown libvirt-qemu:kvm "$IMAGES_DIR/$IMAGE_NAME"
+
+# Detect the appropriate libvirt user:group based on distribution
+if [[ -f /etc/debian_version ]]; then
+  # Debian/Ubuntu based
+  LIBVIRT_USER="libvirt-qemu:kvm"
+elif [[ -f /etc/redhat-release ]] || [[ -f /etc/fedora-release ]]; then
+  # RHEL/Fedora/CentOS based
+  LIBVIRT_USER="qemu:qemu"
+else
+  # Fallback: try to detect by checking which user exists
+  if id -u libvirt-qemu >/dev/null 2>&1; then
+    LIBVIRT_USER="libvirt-qemu:kvm"
+  elif id -u qemu >/dev/null 2>&1; then
+    LIBVIRT_USER="qemu:qemu"
+  else
+    echo "  WARNING: Could not detect libvirt user. Using root:root as fallback."
+    LIBVIRT_USER="root:root"
+  fi
+fi
+
+echo "  Using ownership: $LIBVIRT_USER"
+sudo chown "$LIBVIRT_USER" "$IMAGES_DIR/$IMAGE_NAME"
 sudo chmod 0744 "$IMAGES_DIR/$IMAGE_NAME"
 ls -l "$IMAGES_DIR/$IMAGE_NAME"
 
@@ -112,7 +139,7 @@ sudo sed -i \
 
 sudo -u "$VGUSER" -H bash -lc '
   if command -v vagrant >/dev/null 2>&1; then
-    vagrant box add --box-version '"$VM_VERSION"' '"$IMAGES_DIR"'/fortigate.json
+    vagrant box add --provider libvirt --box-version '"$VM_VERSION"' '"$IMAGES_DIR"'/fortigate.json
   else
     echo "  - Vagrant not found for user '"$VGUSER"'. Skipping box add."
   fi

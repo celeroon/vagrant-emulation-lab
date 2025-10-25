@@ -1,0 +1,33 @@
+---
+- name: Initial Setup
+  import_tasks: sections/initial-setup.yml
+
+- name: Configure Interfaces
+  import_tasks: sections/configure-interfaces.yml
+
+- name: Configure DNS Server
+  import_tasks: sections/configure-dns.yml
+
+- name: Create DHCP
+  import_tasks: sections/configure-dhcp.yml
+
+- name: Create Network Addresses
+  import_tasks: sections/create-network-addresses.yml
+
+- name: Configure SDWAN
+  import_tasks: sections/configure-sdwan.yml
+
+- name: Configure IPsec S2S VPN
+  import_tasks: sections/configure-ipsec-s2s-vpn.yml
+
+- name: Configure Routing
+  import_tasks: sections/configure-routing.yml
+
+- name: Configure Policies
+  import_tasks: sections/configure-policies.yml
+
+- name: Configure Syslog
+  import_tasks: sections/configure-syslog.yml
+
+- name: Configure SNMP
+  import_tasks: sections/configure-snmp.yml

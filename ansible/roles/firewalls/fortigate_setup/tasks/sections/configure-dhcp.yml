@@ -1,0 +1,22 @@
+---
+- name: Configure DHCP for VLAN 20 (USERS)
+  fortios_system_dhcp_server:
+    vdom: "root"
+    state: "present"
+    system_dhcp_server:
+      id: 3
+      interface: "vlan20"
+      status: "enable"
+      lease_time: 28800
+      default_gateway: "172.16.20.254"
+      netmask: "255.255.255.0"
+      dns_service: "specify"
+      dns_server1: "{{ dns_server_vlan20 }}"
+      ip_range:
+        - id: 0
+          start_ip: "172.16.20.230"
+          end_ip: "172.16.20.250"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result

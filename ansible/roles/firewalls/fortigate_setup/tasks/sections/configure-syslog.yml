@@ -1,0 +1,29 @@
+---
+- name: Configure syslog settings
+  fortios_log_syslogd_setting:
+    vdom: "root"
+    log_syslogd_setting:
+      status: "enable"
+      server: "{{ elk_ip }}"
+      port: "{{ syslog_port }}"
+      facility: "syslog"
+      source_ip: "{{ syslog_src }}"
+      format: "rfc5424"
+      mode: "udp"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result
+
+- name: Configure general log settings
+  fortinet.fortios.fortios_log_setting:
+    vdom: "root"
+    log_setting:
+      local_in_allow: "enable"
+      local_in_deny_unicast: "enable"
+      local_in_deny_broadcast: "enable"
+      local_out: "enable"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result

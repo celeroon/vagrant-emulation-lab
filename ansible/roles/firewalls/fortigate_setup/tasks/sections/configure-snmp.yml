@@ -1,0 +1,67 @@
+---
+- name: Enable SNMP globally
+  fortinet.fortios.fortios_system_snmp_sysinfo:
+    vdom: "root"
+    system_snmp_sysinfo:
+      status: "enable"
+  register: snmp_sysinfo_result
+  until: snmp_sysinfo_result is success
+  retries: 5
+  delay: 10
+
+- name: Configure SNMP v2 with public community and all events
+  fortinet.fortios.fortios_system_snmp_community:
+    vdom: "root"
+    state: "present"
+    system_snmp_community:
+      id: 1
+      name: "public"
+      query_v2c_status: "enable"
+      events:
+        - cpu-high
+        - mem-low
+        - log-full
+        - intf-ip
+        - vpn-tun-up
+        - vpn-tun-down
+        - ha-switch
+        - ha-hb-failure
+        - ips-signature
+        - ips-anomaly
+        - av-virus
+        - av-oversize
+        - av-pattern
+        - av-fragmented
+        - fm-if-change
+        - fm-conf-change
+        - bgp-established
+        - bgp-backward-transition
+        - ha-member-up
+        - ha-member-down
+        - ent-conf-change
+        - av-conserve
+        - av-bypass
+        - av-oversize-passed
+        - av-oversize-blocked
+        - ips-pkg-update
+        - ips-fail-open
+        - faz-disconnect
+        - wc-ap-up
+        - wc-ap-down
+        - fswctl-session-up
+        - fswctl-session-down
+        - load-balance-real-server-down
+        - device-new
+        - per-cpu-high
+        - dhcp
+        - pool-usage
+        - ospf-nbr-state-change
+        - ospf-virtnbr-state-change
+      hosts:
+        - id: 1
+          ip: "0.0.0.0"
+          interface: "vlan10"
+  register: snmp_result
+  until: snmp_result is success
+  retries: 5
+  delay: 10

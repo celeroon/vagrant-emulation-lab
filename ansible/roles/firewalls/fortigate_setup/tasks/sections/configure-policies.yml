@@ -1,0 +1,158 @@
+---
+- name: Configure firewall policy for VLAN20 to VLAN10
+  fortinet.fortios.fortios_firewall_policy:
+    vdom: "root"
+    state: "present"
+    firewall_policy:
+      policyid: 1001
+      name: "USERS->SERVERS"
+      srcintf:
+        - name: "vlan20"
+      dstintf:
+        - name: "vlan10"
+      srcaddr:
+        - name: "USERS-172.16.20.0/24"
+      dstaddr:
+        - name: "SERVERS-172.16.10.0/24"
+      action: "accept"
+      schedule: "always"
+      service:
+        - name: "ALL"
+      logtraffic: "all"
+  register: result
+  until: result is success
+  retries: 5
+  delay: 10
+
+- name: Configure firewall policy for VLAN10 to VLAN20
+  fortinet.fortios.fortios_firewall_policy:
+    vdom: "root"
+    state: "present"
+    firewall_policy:
+      policyid: 1002
+      name: "SERVERS->USERS"
+      srcintf:
+        - name: "vlan10"
+      dstintf:
+        - name: "vlan20"
+      srcaddr:
+        - name: "SERVERS-172.16.10.0/24"
+      dstaddr:
+        - name: "USERS-172.16.20.0/24"
+      action: "accept"
+      schedule: "always"
+      service:
+        - name: "ALL"
+      logtraffic: "all"
+  register: result
+  until: result is success
+  retries: 5
+  delay: 10
+
+- name: Configure firewall policy for LAN to WAN with multiple interfaces
+  fortinet.fortios.fortios_firewall_policy:
+    vdom: "root"
+    state: "present"
+    firewall_policy:
+      policyid: 1003
+      name: "LAN->SDWAN"
+      srcintf:
+        - name: "vlan10"
+        - name: "vlan20"
+        - name: "vlan30"
+      dstintf:
+        - name: "virtual-wan-link"
+      srcaddr:
+        - name: "LAN-networks"
+      dstaddr:
+        - name: "all"
+      action: "accept"
+      schedule: "always"
+      service:
+        - name: "ALL"
+      logtraffic: "all"
+      nat: "enable"
+  register: result
+  until: result is success
+  retries: 5
+  delay: 10
+
+- name: Configure firewall policy for LAN to BRANCH-1
+  fortinet.fortios.fortios_firewall_policy:
+    vdom: "root"
+    state: "present"
+    firewall_policy:
+      policyid: 1004
+      name: "LAN->BRANCH-1"
+      srcintf:
+        - name: "vlan10"
+        - name: "vlan20"
+      dstintf:
+        - name: "{{ vpn_name }}"
+      srcaddr:
+        - name: "USERS-172.16.20.0/24"
+        - name: "SERVERS-172.16.10.0/24"
+      dstaddr:
+        - name: "BRANCH-1-172.30.10.0/24"
+      action: "accept"
+      schedule: "always"
+      service:
+        - name: "ALL"
+      logtraffic: "all"
+  register: result
+  until: result is success
+  retries: 5
+  delay: 10
+
+- name: Configure firewall policy for BRANCH-1 to LAN
+  fortinet.fortios.fortios_firewall_policy:
+    vdom: "root"
+    state: "present"
+    firewall_policy:
+      policyid: 1005
+      name: "BRANCH-1->LAN"
+      srcintf:
+        - name: "{{ vpn_name }}"
+      dstintf:
+        - name: "vlan10"
+        - name: "vlan20"
+      srcaddr:
+        - name: "BRANCH-1-172.30.10.0/24"
+      dstaddr:
+        - name: "USERS-172.16.20.0/24"
+        - name: "SERVERS-172.16.10.0/24"
+      action: "accept"
+      schedule: "always"
+      service:
+        - name: "ALL"
+      logtraffic: "all"
+  register: result
+  until: result is success
+  retries: 5
+  delay: 10
+
+# - name: Configure firewall policies
+#   fortinet.fortios.fortios_firewall_policy:
+#     vdom: "root"
+#     state: "present"
+#     firewall_policy:
+#       policyid: 1111
+#       name: "ALLOW-ALL"
+#       srcintf:
+#         - name: "any"
+#       dstintf:
+#         - name: "any"
+#       srcaddr:
+#         - name: "all"
+#       dstaddr:
+#         - name: "all"
+#       action: "accept"
+#       schedule: "always"
+#       service:
+#         - name: "ALL"
+#       logtraffic: "all"
+#       nat: "enable"
+#   register: result
+#   until: result is success
+#   retries: 5
+#   delay: 10

@@ -1,0 +1,52 @@
+---
+- name: Enable SD-WAN
+  fortinet.fortios.fortios_system_sdwan:
+    vdom: "root"
+    system_sdwan:
+      status: "enable"
+
+- name: Add SD-WAN Members (port2)
+  fortinet.fortios.fortios_system_sdwan:
+    vdom: "root"
+    system_sdwan:
+      members:
+        - seq_num: 1
+          interface: "port2"
+          gateway: "192.0.2.1"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result
+
+- name: Set load-balance mode to source-ip-based
+  fortinet.fortios.fortios_system_sdwan:
+    vdom: "root"
+    system_sdwan:
+      load_balance_mode: "source-ip-based"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result
+
+- name: Configure SD-WAN health-check with multiple servers and SLA
+  fortinet.fortios.fortios_system_sdwan:
+    vdom: "root"
+    system_sdwan:
+      health_check:
+        - name: "Google2"
+          server: 
+            - "8.8.8.8"
+            - "8.8.4.4"
+          sla_fail_log_period: 10
+          sla_pass_log_period: 30
+          members:
+            - seq_num: 0
+          sla:
+            - id: 1
+              latency_threshold: 100
+              jitter_threshold: 10
+              packetloss_threshold: 5
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result

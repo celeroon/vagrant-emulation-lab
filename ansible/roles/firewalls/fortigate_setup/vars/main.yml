@@ -1,0 +1,10 @@
+---
+fgt1_hostname: "FortiGate-HQ1"
+syslog_src: "172.16.10.254"
+syslog_port: 5145
+dns_server_vlan20: "172.16.20.254"
+
+vpn_name: "branch-1"
+wan_interface: "port2"
+remote_gateway_ip: "100.64.0.6"
+preshared_key: "vagrant"

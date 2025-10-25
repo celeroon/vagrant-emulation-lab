@@ -1,0 +1,69 @@
+---
+- name: Configure IPsec VPN Phase 1 (IKE)
+  fortinet.fortios.fortios_vpn_ipsec_phase1_interface:
+    vdom: "root"
+    state: "present"
+    vpn_ipsec_phase1_interface:
+      name: "{{ vpn_name }}"
+      type: "static"
+      interface: "{{ wan_interface }}"
+      ike_version: 2
+      peertype: "any"
+      net_device: "disable"
+      proposal: "des-sha1"
+      dhgrp: "2"
+      remote_gw: "{{ remote_gateway_ip }}"
+      psksecret: "{{ preshared_key }}"
+      dpd: "on-idle"
+      dpd_retrycount: 3
+      dpd_retryinterval: 5
+      keylife: 28800
+      nattraversal: "disable"
+      mode_cfg: "disable"
+      wizard_type: "custom"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result
+
+- name: Configure IPsec VPN Phase 2 (IPsec) - SERVERS network selector
+  fortinet.fortios.fortios_vpn_ipsec_phase2_interface:
+    vdom: "root"
+    state: "present"
+    vpn_ipsec_phase2_interface:
+      name: "{{ vpn_name }}-s1"
+      phase1name: "{{ vpn_name }}"
+      proposal: "des-sha1"
+      dhgrp: "2"
+      auto_negotiate: "enable"
+      src_addr_type: "name"
+      dst_addr_type: "name"
+      src_name: "SERVERS-172.16.10.0/24"
+      dst_name: "BRANCH-1-172.30.10.0/24"
+      keylife_type: "seconds"
+      keylifeseconds: 3600
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result
+
+- name: Configure IPsec VPN Phase 2 (IPsec) - USERS network selector
+  fortinet.fortios.fortios_vpn_ipsec_phase2_interface:
+    vdom: "root"
+    state: "present"
+    vpn_ipsec_phase2_interface:
+      name: "{{ vpn_name }}-s2"
+      phase1name: "{{ vpn_name }}"
+      proposal: "des-sha1"
+      dhgrp: "2"
+      auto_negotiate: "enable"
+      src_addr_type: "name"
+      dst_addr_type: "name"
+      src_name: "USERS-172.16.20.0/24"
+      dst_name: "BRANCH-1-172.30.10.0/24"
+      keylife_type: "seconds"
+      keylifeseconds: 3600
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result

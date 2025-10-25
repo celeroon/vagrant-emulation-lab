@@ -1,0 +1,36 @@
+---
+- name: Configure DNS database zone "lab.local"
+  fortinet.fortios.fortios_system_dns_database:
+    vdom: "root"
+    state: "present"
+    system_dns_database:
+      name: "lab"
+      status: "enable"
+      domain: "lab.local"
+      type: "primary"
+      view: "shadow"
+      ttl: 86400
+      authoritative: "enable"
+      source_ip: "0.0.0.0"
+      primary_name: "dns"
+      contact: "host"
+      dns_entry:
+        - id: 1
+          status: "enable"
+          type: "A"
+          ttl: 0
+          hostname: "email"
+          ip: "203.0.113.6"
+
+- name: Configure DNS server for VLAN interfaces
+  fortinet.fortios.fortios_system_dns_server:
+    vdom: "root"
+    state: "present"
+    system_dns_server:
+      name: "{{ item }}"
+      mode: "recursive"
+      doh: "disable"
+  loop:
+    - "vlan10"
+    - "vlan20"
+    - "vlan30"

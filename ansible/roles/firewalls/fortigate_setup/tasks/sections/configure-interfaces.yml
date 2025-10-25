@@ -1,0 +1,81 @@
+---
+- name: Configure port2 (WAN)
+  fortios_system_interface:
+    vdom: "root"
+    state: "present"
+    system_interface:
+      name: "port2"
+      mode: "static"
+      ip: "192.0.2.6 255.255.255.248"
+      description: "WAN"
+      alias: "WAN1"
+      allowaccess:
+        - "ping"
+      role: "wan"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result
+
+- name: Configure VLAN 10 (SERVERS) under port3
+  fortios_system_interface:
+    vdom: "root"
+    state: "present"
+    system_interface:
+      name: "vlan10"
+      vdom: "root"
+      interface: "port3"
+      vlanid: "10"
+      ip: "172.16.10.254 255.255.255.0"
+      description: "SERVERS"
+      alias: "SERVERS"
+      allowaccess:
+        - "ping"
+        - "ssh"
+        - "https"
+        - "snmp"
+      role: "lan"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result
+
+- name: Configure VLAN 20 (USERS) under port3
+  fortios_system_interface:
+    vdom: "root"
+    state: "present"
+    system_interface:
+      name: "vlan20"
+      vdom: "root"
+      interface: "port3"
+      vlanid: "20"
+      ip: "172.16.20.254 255.255.255.0"
+      description: "USERS"
+      allowaccess:
+        - "ping"
+      alias: "USERS"
+      role: "lan"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result
+
+- name: Configure VLAN 30 (DMZ) under port3
+  fortios_system_interface:
+    vdom: "root"
+    state: "present"
+    system_interface:
+      name: "vlan30"
+      vdom: "root"
+      interface: "port3"
+      vlanid: "30"
+      ip: "172.16.30.254 255.255.255.0"
+      description: "DMZ"
+      alias: "DMZ"
+      allowaccess:
+        - "ping"
+      role: "lan"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result

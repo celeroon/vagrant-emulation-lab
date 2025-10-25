@@ -1,0 +1,32 @@
+---
+- name: Create firewall addresses
+  fortios_firewall_address:
+    vdom: "root"
+    state: "present"
+    firewall_address:
+      name: "{{ item.name }}"
+      subnet: "{{ item.subnet }}"
+  loop:
+    - { name: "SERVERS-172.16.10.0/24", subnet: "172.16.10.0 255.255.255.0" }
+    - { name: "USERS-172.16.20.0/24", subnet: "172.16.20.0 255.255.255.0" }
+    - { name: "DMZ-172.16.30.0/24", subnet: "172.16.30.0 255.255.255.0"}
+    - { name: "BRANCH-1-172.30.10.0/24", subnet: "172.30.10.0 255.255.255.0"}
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result
+
+- name: Configure firewall address group
+  fortios_firewall_addrgrp:
+    vdom: "root"
+    state: "present"
+    firewall_addrgrp:
+      name: "LAN-networks"
+      member:
+        - name: "SERVERS-172.16.10.0/24"
+        - name: "USERS-172.16.20.0/24"
+        - name: "DMZ-172.16.30.0/24"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result

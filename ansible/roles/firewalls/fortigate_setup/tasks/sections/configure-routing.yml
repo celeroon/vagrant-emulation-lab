@@ -1,0 +1,32 @@
+---
+- name: Configure static route for SD-WAN
+  fortinet.fortios.fortios_router_static:
+    vdom: "root"
+    state: "present"
+    router_static:
+      seq_num: 1
+      dst: "0.0.0.0/0"
+      sdwan_zone:
+        - name: "virtual-wan-link"
+      distance: 1  # Equivalent to `set distance 1`
+      status: "enable"  # Equivalent to `set status enable`
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result
+
+- name: Configure static route for BRANCH-1 network
+  fortinet.fortios.fortios_router_static:
+    vdom: "root"
+    state: "present"
+    router_static:
+      seq_num: 2
+      dst: "172.30.10.0/24"
+      device: "{{ vpn_name }}"
+      distance: 10
+      priority: 1
+      comment: "Route to BRANCH-1 site via IPsec VPN"
+  retries: 5
+  delay: 10
+  until: result is success
+  register: result

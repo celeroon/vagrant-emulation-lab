@@ -1,0 +1,5 @@
+---
+root_dir: "{{ playbook_dir | dirname }}"
+# elk_version: "9.1.2"
+elk_ip: "172.16.10.5"
+# elk_password: "elastic"

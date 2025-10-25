@@ -19,3 +19,13 @@
   until: result is success
   retries: 10
   delay: 15
+
+- name: Set timezone
+  fortios_system_global:
+    vdom: "root"
+    system_global:
+      timezone: "26"
+  register: result
+  until: result is success
+  retries: 5
+  delay: 10

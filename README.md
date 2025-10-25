@@ -54,8 +54,8 @@ VM implementations are divided into logical network segments as shown in the top
 
 #### HQ User Segment
 
-* [Windows workstation](/resources/docs/vm-setup/setup-windows-workstation.md)
 * [NAS](/resources/docs/vm-setup/setup-nas.md)
+* [Windows workstation](/resources/docs/vm-setup/setup-windows-workstation.md)
 
 #### Branch-1 Segment
 

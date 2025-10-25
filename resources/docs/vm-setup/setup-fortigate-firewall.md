@@ -3,7 +3,7 @@
 Run the VM from the main working directory
 
 ```bash
-vagrant up fortigate-1
+vagrant up fortigate-1 --no-provision
 ```
 
 Let’s first set up FortiGate version 7.6 because it has limitations. Access the management IP address `192.168.225.10` via HTTPS to configure FortiGate through the GUI. Use the default username `admin` with your newly set password during the first login to register FortiGate.

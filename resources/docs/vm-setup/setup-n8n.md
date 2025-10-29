@@ -40,7 +40,7 @@ Create a self-signed root CA certificate
 sudo openssl req -x509 -new -sha256 -days 1825 \
   -key /opt/n8n-compose/certs/ca.key \
   -out /opt/n8n-compose/certs/ca.crt \
-  -subj "/CN=Vlad Lab Local CA"
+  -subj "/CN=Lab Local CA"
 ```
 
 Generate a private key for the n8n server

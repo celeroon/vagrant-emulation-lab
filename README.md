@@ -73,6 +73,13 @@ VM implementations are divided into logical network segments as shown in the top
 
 ## Scenarios (attack and detect)
 
+Execution sequence workflow #1
+
+1. [Suspicious Configuration Change Sequence on Cisco IOS Device](https://github.com/celeroon/vagrant-emulation-lab/blob/main/resources/attack-detect-scenarios/initial-access/network-service/common-service-attack/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device.md)
+2. [Suspicious Gateway Network Scan](https://github.com/celeroon/vagrant-emulation-lab/blob/main/resources/attack-detect-scenarios/reconnaissance/networkidiscovery-and-port-scanning/Suspicious-Gateway-Network-Scan/Suspicious-Gateway-Network-Scan.md)
+3. [Remote connection followed by suspicious process execution](https://github.com/celeroon/vagrant-emulation-lab/blob/main/resources/attack-detect-scenarios/initial-access/remote-admin-tools-windows/remote-connection-followed-by-suspicious-process-execution/Remote-connection-followed-by-suspicious-process-execution.md)
+4. [Suspicious PowerShell Download and Execute Pattern](https://github.com/celeroon/vagrant-emulation-lab/blob/main/resources/attack-detect-scenarios/execution/suspicious-powershell-download-and-execute-pattern/Suspicious-PowerShell-Download-and-Execute-Pattern.md)
+
 This section will provide instructions on how to generate events, build queries, and create Elastic rules to detect malicious activity in the lab environment. These scenarios are categorized based on the [MITRE ATT&CK](https://attack.mitre.org/) framework.
 
 - **Reconnaissance**

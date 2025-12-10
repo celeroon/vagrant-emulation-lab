@@ -113,7 +113,7 @@ fi
 
 echo "[7/8] Build box with Packer (version=$VM_VERSION, image_name=$IMAGE_NAME)..."
 pushd "$WORKDIR" >/dev/null
-packer build -var "version=$VM_VERSION" -var "image_name=$IMAGE_NAME" fortigate-ssl-vrf.pkr.hcl
+PACKER_LOG=1 packer build -var "version=$VM_VERSION" -var "image_name=$IMAGE_NAME" fortigate-ssl-vrf.pkr.hcl
 popd >/dev/null
 
 echo "[8/8] Move artifacts, patch JSON, and add box..."

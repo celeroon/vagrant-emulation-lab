@@ -14,7 +14,7 @@ You can find the official recommendations in the repository:
 I followed the instructions described in Rizqi Setyo Kusprihantanto’s blog posts:
 
 * [Part 1](https://osintteam.blog/building-capev2-automated-malware-analysis-sandbox-part-1-da2a6ff69cdb)
-* [Part 2]([https://infosecwriteupsudo chown cape:cape /opt/CAPEv2/conf/cuckoo.confs.com/building-capev2-automated-malware-analysis-sandbox-part-2-0c47e4b5cbcd](https://medium.com/@rizqisetyokus/building-capev2-automated-malware-analysis-sandbox-part-2-0c47e4b5cbcd))
+* [Part 2](https://medium.com/@rizqisetyokus/building-capev2-automated-malware-analysis-sandbox-part-2-0c47e4b5cbcd)
 * [Part 3](https://osintteam.blog/building-capev2-automated-malware-analysis-sandbox-part-3-d5535a0ab6f6)
 
 > [!IMPORTANT]  

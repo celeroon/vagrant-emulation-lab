@@ -11,7 +11,7 @@ This project will grow with ideas for emulation techniques - both custom and doc
 The topology of this project will change from time to time. I will add new guides on how to implement new tools in the lab.
 
 <div align="center">
-    <img alt="Vagrant Lab Virtual Topology" src="/resources/images/vagrant-lab-virtual-topology.svg" width="100%">
+    <img alt="Vagrant Lab Virtual Topology" src="/resources/images/vagrant-libvirt-lab.svg" width="100%">
 </div>
 
 * [Lab Implementation Overview](/resources/docs/lab-implementation-overview.md)

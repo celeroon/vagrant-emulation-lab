@@ -4,6 +4,8 @@ config.vm.define "elk-1" do |node|
   node.vm.hostname = "elk-1"
   node.vm.provider :libvirt do |domain|
     domain.management_network_mac = "52:54:02:54:01:05" # eth0
+    domain.cpu_mode = "host-passthrough"
+    domain.machine_type = "q35"
     domain.cpus = 4
     domain.memory = 16384
     domain.storage :file, :path => 'es-sv-data.qcow2', :size => '100G', :bus => 'virtio', :type => 'qcow2', :discard => 'unmap', :detect_zeroes => 'on'

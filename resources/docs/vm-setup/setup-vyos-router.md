@@ -85,6 +85,13 @@ set interfaces ethernet eth7 address 100.64.0.1/29
 set interfaces ethernet eth7 description '***To Branch-1***'
 ```
 
+Configure ICS-Branch interface (eth8)
+
+```bash
+set interfaces ethernet eth8 address 100.67.0.1/29
+set interfaces ethernet eth8 description '***To ICS-Branch***'
+```
+
 Configure default route via upstream gateway (lab virbr10 interface)
 
 ```bash
@@ -199,6 +206,24 @@ set nat source rule 105 outbound-interface name eth1
 
 ```bash
 set nat source rule 105 translation address masquerade
+```
+
+* rule 106 to NAT ICS-Branch subnet traffic
+
+```bash
+set nat source rule 106 description 'NAT ICS-branch'
+```
+
+```bash
+set nat source rule 106 source address 100.67.0.0/29
+```
+
+```bash
+set nat source rule 106 outbound-interface name eth1
+```
+
+```bash
+set nat source rule 106 translation address masquerade
 ```
 
 Save and apply configuration

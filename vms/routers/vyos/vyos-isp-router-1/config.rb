@@ -21,6 +21,7 @@ config.vm.define "vyos-isp-router-1" do |node|
     { iface: "eth5", lip: "127.1.13.1", lport: 10113, rip: "127.1.13.2", rport: 10113 }, # -> Payload
     { iface: "eth6", lip: "127.1.14.1", lport: 10114, rip: "127.1.14.2", rport: 10114 }, # -> Kali
     { iface: "eth7", lip: "127.1.15.1", lport: 10115, rip: "127.1.15.2", rport: 10115 }, # -> branch-1 (cat8kv)
+    { iface: "eth8", lip: "127.1.16.1", lport: 10116, rip: "127.1.16.2", rport: 10116 }, # -> branch-2 (OT)
   ]
 
   tunnels.each do |t|

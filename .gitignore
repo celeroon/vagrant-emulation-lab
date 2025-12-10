@@ -6,6 +6,9 @@
 .vagrant/
 *.qcow2
 
+# Quick setup state
+.quick-setup-state/
+
 # Test directories
 test/
 vms/test
@@ -76,3 +79,7 @@ insecure_private_key
 *.exe
 
 *.iso
+*.log
+
+quick-setup-config.yml
+quick-setup.sh

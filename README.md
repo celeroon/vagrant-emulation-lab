@@ -103,6 +103,19 @@ This section will provide instructions on how to create n8n workflows based on t
 * [Suspicious Configuration Change Sequence on Cisco IOS Device](/resources/n8n-workflows/Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device/n8n-Suspicious-Configuration-Change-Sequence-on-Cisco-IOS-Device.md)
 * [Suspicious PowerShell Download and Execute Pattern](/resources/n8n-workflows/Suspicious-PowerShell-Download-and-Execute-Pattern/n8n-Suspicious-PowerShell-Download-and-Execute-Pattern.md)
 
+## ICS/OT segment
+
+In this section I want to provide a simple ICS segment lab implementation just to show how it can be manipulated and how to monitor it.
+
+* [Setup ICS FortiGate](/resources/docs/vm-setup/ics/setup-fortigate-ics.md)
+* [Setup ICS OVS Switch](/resources/docs/vm-setup/ics/setup-ovs-ics-switch.md)
+* [Setup ICS Simulation](/resources/docs/vm-setup/ics/setup-ics-simulation.md)
+* [Setup ICS OpenPLC](/resources/docs/vm-setup/ics/setup-ics-openplc.md)
+* [Setup ICS HMI](/resources/docs/vm-setup/ics/setup-ics-hmi.md)
+* [Setup ICS Malcolm](/resources/docs/vm-setup/ics/setup-ics-malcolm.md)
+* [Setup host](/resources/docs/vm-setup/ics/setup-ics-host.md)
+* [Setup ICS Kali Linux](/resources/docs/vm-setup/ics/setup-ics-kali.md)
+
 ## Disclaimer
 
 This project is for **educational and research use in a closed, virtual lab environment only**. Do **not** use any techniques, tools, or configurations from this repository against real systems, production networks, or assets you do not own or lack explicit written permission to test. Always comply with all applicable laws, regulations, licenses, and organizational policies.

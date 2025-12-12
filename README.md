@@ -115,6 +115,7 @@ In this section I want to provide a simple ICS segment lab implementation just t
 * [Setup ICS Malcolm](/resources/docs/vm-setup/ics/setup-ics-malcolm.md)
 * [Setup host](/resources/docs/vm-setup/ics/setup-ics-host.md)
 * [Setup ICS Kali Linux](/resources/docs/vm-setup/ics/setup-ics-kali.md)
+* [Setup ICS Cyber Vision](/resources/docs/vm-setup/ics/setup-ics-cybervision.md)
 
 ## Disclaimer
 

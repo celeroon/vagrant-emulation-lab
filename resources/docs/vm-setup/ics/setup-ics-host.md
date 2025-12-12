@@ -15,3 +15,15 @@ sudo tc filter add dev tap-ics-src ingress matchall \
 sudo tc filter add dev tap-ics-src egress  matchall \
        action mirred egress mirror dev tap-ics-dst
 ```
+
+**Cyber Vision tap interface** 
+
+```bash
+sudo tc filter add dev tap-ics-src ingress matchall \
+       action mirred egress mirror dev tap-ics-dst-cv
+```
+
+```bash
+sudo tc filter add dev tap-ics-src egress  matchall \
+       action mirred egress mirror dev tap-ics-dst-cv
+```
